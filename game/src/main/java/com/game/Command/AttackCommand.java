@@ -1,6 +1,6 @@
 package com.game.Command;
 
-public class AttackCommand implements Command{
+public class AttackCommand implements ICommand {
     private Object opponent;
     private int attackRate;
 
@@ -11,6 +11,6 @@ public class AttackCommand implements Command{
 
     @Override
     public void execute() {
-        //attack logic
+        ////TODO: add attack logic
     }
 }

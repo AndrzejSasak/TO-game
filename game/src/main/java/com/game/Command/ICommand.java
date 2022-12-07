@@ -1,5 +1,5 @@
 package com.game.Command;
 
-public interface Command {
+public interface ICommand {
     void execute();
 }

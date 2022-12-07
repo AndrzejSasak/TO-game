@@ -1,6 +1,6 @@
 package com.game.Command;
 
-public class WaitCommand implements Command{
+public class WaitCommand implements ICommand {
     private Object player;
 
     WaitCommand(Object player) {
@@ -9,6 +9,6 @@ public class WaitCommand implements Command{
 
     @Override
     public void execute() {
-        // wait logic (raise critic to 100%)
+        //TODO: wait logic (raise critic to 100%)
     }
 }
