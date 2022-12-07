@@ -10,14 +10,11 @@ public class Client{
     public static void main(String[] args) throws IOException {
 
         Socket clientSocket = new Socket("localhost", 5000);
+        IOManager ioManager = new IOManager(clientSocket);
 
-        PrintWriter pr = new PrintWriter(clientSocket.getOutputStream());
-        pr.println("Client connected");
-        pr.flush();
+        ioManager.sendMessage("connected");
+        String testStr = ioManager.readMessage();
 
-        InputStreamReader in = new InputStreamReader(clientSocket.getInputStream());
-        BufferedReader bf = new BufferedReader(in);
-        String testStr = bf.readLine();
-        System.out.println("Server message "+testStr);
+        System.out.println("Server message "+ testStr);
     }
 }

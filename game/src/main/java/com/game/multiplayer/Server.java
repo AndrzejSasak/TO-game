@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 //listen server
 public class Server{
-
+    private static ServerSocket serverSocket;
     private static ServerState serverState = ServerState.IDLE;
     private boolean bServerMove = false;
     final private static int playerNum = 1;
@@ -26,30 +26,49 @@ public class Server{
 
     private static NetRole roleStartedLastRound;
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        ServerSocket serverSocket = new ServerSocket(5000);
+    private static volatile Server INSTANCE;
 
+    public static Server getInstance(){
+        if(null == INSTANCE){
+            try{
+                INSTANCE = new Server();
+            }
+            catch (Exception e){
+                System.out.println("Error while creating server");
+            }
+        }
+        return INSTANCE;
+    }
+
+    private Server() throws IOException {
+         serverSocket = new ServerSocket(5000);
+    }
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        new Server().gameLoop();
+    }
+
+    private void gameLoop() throws IOException, InterruptedException {
         serverState = ServerState.WAIT_FOR_CONNECTION;
+
         System.out.println("Waiting for opponent");
         DotPrintService dotPrintService = new DotPrintService();
         dotPrintService.startTimer();
-
         Socket clientSocket = serverSocket.accept();
 
         serverState = ServerState.STARTING_GAME;
+
         dotPrintService.stopTimer();
         System.out.println("\nclient connected");
         TimeUnit.SECONDS.sleep(3);
 
-        PrintWriter pr = new PrintWriter(clientSocket.getOutputStream());
-        InputStreamReader in = new InputStreamReader(clientSocket.getInputStream());
-        BufferedReader bf = new BufferedReader(in);
+        IOManager ioManager = new IOManager(clientSocket);
 
         serverState = ServerState.GAME_IN_PROGRESS;
-        String testStr = bf.readLine();
+
+        String testStr = ioManager.readMessage();
         System.out.println("client message"+testStr);
-        pr.println("connection established");
-        pr.flush();
+        ioManager.sendMessage("connection established");
 
         serverState = ServerState.END_GAME;
     }
