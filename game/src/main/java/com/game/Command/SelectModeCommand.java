@@ -1,10 +1,12 @@
 package com.game.Command;
 
+import com.game.gamemode.GameMode;
+
 public class SelectModeCommand implements ICommand {
 
-    private Object gameMode;
+    private GameMode gameMode;
 
-    SelectModeCommand(Object gameMode) {
+    SelectModeCommand(GameMode gameMode) {
         this.gameMode = gameMode;
     }
 
