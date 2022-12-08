@@ -23,5 +23,6 @@ public class DotPrintService {
     public void stopTimer()
     {
         executor.shutdown();
+        System.out.print('\n');
     }
 }

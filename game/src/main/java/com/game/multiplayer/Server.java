@@ -59,7 +59,7 @@ public class Server{
         serverState = ServerState.STARTING_GAME;
 
         dotPrintService.stopTimer();
-        System.out.println("\nclient connected");
+        System.out.println("client connected");
         TimeUnit.SECONDS.sleep(3);
 
         IOManager ioManager = new IOManager(clientSocket);
