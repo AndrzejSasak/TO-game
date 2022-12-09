@@ -1,43 +1,46 @@
 package com.game.entities;
 
-import com.game.entities.professions.Profession;
+import com.game.Messages;
+import com.game.controllers.EntityController;
 
 import java.util.List;
+import java.util.Random;
 
-abstract class Entity {
-    protected Profession profession;
+public abstract class Entity {
     protected int hp;
     protected boolean alive;
-
+    protected Random rand;
     protected String name;
+    EntityController controller;
 
-    protected Entity(Profession profession, String name){
-        this.profession = profession;
-        hp = profession.getMaxHp();
-        alive = true;
+    protected Entity(String name, EntityController controller){
+        this.controller = controller;
         this.name = name;
+        alive = true;
+        rand = new Random();
     }
 
-    public abstract void attack(List<Entity> enemies);
-    public abstract void hit(Entity enemy);
-    public abstract void getHit(int attackPoints, Entity attacker);
+    public void update(List<Entity> allFriends, List<Entity> allEnemies){
+        Entity target = controller.getNextTarget(this, allFriends, allEnemies);
+        if (target != null) {
+            attack(target, allFriends, allEnemies);
+        }
+        else
+            Messages.passMessage(this);
+    }
+
+    protected abstract void attack(Entity target, List<Entity> allFriends, List<Entity> allEnemies);
+    public abstract void getHit(int attackPoints, Entity attacker, List<Entity> allFriends, List<Entity> allEnemies);
+    public abstract List<Entity> getPreferredTargets(List<Entity> allEnemies);
+    public abstract int getMaxHp();
+    public abstract String getProfessionName();
 
     public boolean isDead(){
         return !alive;
     }
-
     public int getHp() {
         return hp;
     }
-
-    public int getMaxHp() {
-        return profession.getMaxHp();
-    }
-
-    public String getProfessionName(){
-        return profession.getProfessionName();
-    }
-
     public String getName(){
         return name;
     }
