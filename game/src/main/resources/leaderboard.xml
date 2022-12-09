@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Leaderboard>
+    <Players>
+        <Player>
+            <login>ExampleUser</login>
+            <highScore>1234</highScore>
+        </Player>
+        <Player>
+            <login>User1</login>
+            <highScore>12345</highScore>
+        </Player>
+        <Player>
+            <login>User2</login>
+            <highScore>2345</highScore>
+        </Player>
+    </Players>
+</Leaderboard>
