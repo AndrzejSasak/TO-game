@@ -1,4 +1,4 @@
-package com.game.entities;
+package com.game.leaderboard;
 
 import com.game.controllers.Player;
 import jakarta.xml.bind.annotation.*;

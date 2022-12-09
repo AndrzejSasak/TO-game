@@ -2,16 +2,20 @@
 <Leaderboard>
     <Players>
         <Player>
-            <login>ExampleUser</login>
-            <highScore>1234</highScore>
-        </Player>
-        <Player>
             <login>User1</login>
             <highScore>12345</highScore>
         </Player>
         <Player>
             <login>User2</login>
             <highScore>2345</highScore>
+        </Player>
+        <Player>
+            <login>ExampleUser</login>
+            <highScore>1234</highScore>
+        </Player>
+        <Player>
+            <login>login</login>
+            <highScore>789</highScore>
         </Player>
     </Players>
 </Leaderboard>
