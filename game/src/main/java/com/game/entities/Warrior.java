@@ -22,6 +22,11 @@ public class Warrior extends Entity {
             return (int) (attack * 1.2);
         return attack;
     }
+    private int resistance(int attackPoints, Entity enemy){
+        if(enemy instanceof Archer)
+            return (int) (attackPoints * 0.9);
+        return attackPoints;
+    }
 
     @Override
     public void attack(Entity target, List<Entity> allFriends, List<Entity> allEnemies) {
@@ -34,7 +39,20 @@ public class Warrior extends Entity {
         if (!alive)
             return;
 
-        hp -= attackPoints;
+        if (!(attacker instanceof Wizard) && rand.nextDouble(1.) < 0.15){
+            Messages.dodgeMessage(this);
+            if (rand.nextDouble(1.) < 0.5){
+                Messages.counterattackMessage(this, attacker);
+                attacker.getHit(attack, this, allEnemies, allFriends);
+            }
+            return;
+        }
+
+        if(attacker instanceof Archer)
+            hp -= (int) (attackPoints * 0.9);
+        else
+            hp -= attackPoints;
+
         if(hp < 1){
             hp = 0;
             alive = false;

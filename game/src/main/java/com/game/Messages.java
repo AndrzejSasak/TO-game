@@ -24,4 +24,12 @@ public class Messages {
         String message = "Info: " + dead.getName() + " is dead!";
         System.out.println(message);
     }
+    public static void dodgeMessage(Entity entity){
+        String message = entity.getName() + " parried attack!";
+        System.out.println(message);
+    }
+    public static void counterattackMessage(Entity attacker, Entity attacked){
+        String message = "Info! " + attacker.getNameInfo() + " counterattacks: " + attacked.getNameInfo() + "!";
+        System.out.println(message);
+    }
 }

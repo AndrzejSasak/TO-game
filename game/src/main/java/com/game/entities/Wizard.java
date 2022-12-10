@@ -41,6 +41,15 @@ public class Wizard extends Entity {
         if (!alive)
             return;
 
+        if (rand.nextDouble(1.) < 0.1){
+            Messages.dodgeMessage(this);
+            if (rand.nextDouble(1.) < 0.5){
+                Messages.counterattackMessage(this, attacker);
+                attacker.getHit(attack, this, allEnemies, allFriends);
+            }
+            return;
+        }
+
         hp -= attackPoints;
         if(hp < 1){
             hp = 0;
