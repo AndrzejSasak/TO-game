@@ -28,11 +28,11 @@ public class Player implements EntityController{
 
         for (int i = 0; i < allFriends.size(); i++){
             Entity target = allFriends.get(i);
-            System.out.println(target.getName() + " (" + target.getHp() + "/" + target.getMaxHp() + ")");
+            System.out.println(target.getNameInfo());
         }
         for (int i = 0; i < allEnemies.size(); i++){
             Entity target = allEnemies.get(i);
-            System.out.println(i + " " + target.getName() + " (" + target.getHp() + "/" + target.getMaxHp() + ")");
+            System.out.println(i + " " + target.getNameInfo());
         }
         Scanner myInput = new Scanner( System.in );
         int a = myInput.nextInt();

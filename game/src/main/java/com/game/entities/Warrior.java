@@ -31,17 +31,23 @@ public class Warrior extends Entity {
 
     @Override
     public void getHit(int attackPoints, Entity attacker, List<Entity> allFriends, List<Entity> allEnemies) {
+        if (!alive)
+            return;
+
         hp -= attackPoints;
-        Messages.hitMessage(this, attackPoints);
-        if(hp < 0){
+        if(hp < 1){
+            hp = 0;
             alive = false;
-            Messages.deathMessage(this);
         }
+
+        Messages.hitMessage(this, attackPoints);
+        if(hp == 0)
+            Messages.deathMessage(this);
     }
 
     @Override
     public List<Entity> getPreferredTargets(List<Entity> allEnemies) {
-        return allEnemies.stream().filter(entity -> entity instanceof Archer).collect(Collectors.toList());
+        return allEnemies.stream().filter(entity -> entity instanceof Archer && !entity.isDead()).collect(Collectors.toList());
     }
 
     @Override
