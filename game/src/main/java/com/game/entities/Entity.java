@@ -38,14 +38,6 @@ public abstract class Entity {
     public abstract int getMaxHp();
     public abstract String getProfessionName();
 
-    public void takeDamage(int dmg) {
-        hp -= dmg;
-        if(hp < 0)
-        {
-            alive = false;
-        }
-    }
-
     public void revive() {hp = maxHp; alive = true; }
     public int getAttack() {return this.attack;}
     public boolean isDead(){
