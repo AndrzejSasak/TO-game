@@ -8,12 +8,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Warrior extends Entity {
-    private int maxHp = 350;
-    private int attack = 20;
-    private final String professionName = "Warrior";
+
 
     public Warrior(String name, EntityController controller){
         super(name, controller);
+        this.maxHp = 350;
+        this.attack = 20;
+        this.professionName = "Warrior";
         this.hp = maxHp;
     }
 

@@ -9,12 +9,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Wizard extends Entity {
-    private int maxHp = 380;
-    private int attack = 28;
-    private final String professionName = "Wizard";
+
 
     public Wizard(String name, EntityController controller){
         super(name, controller);
+        this.maxHp = 380;
+        this.attack = 28;
+        this.professionName = "Wizard";
         this.hp = maxHp;
     }
 

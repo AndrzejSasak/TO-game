@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Random;
 
 public abstract class Entity {
+    protected int maxHp;
+    protected int attack;
+    protected String professionName;
     protected int hp;
     protected boolean alive;
     protected Random rand;
@@ -35,6 +38,8 @@ public abstract class Entity {
     public abstract int getMaxHp();
     public abstract String getProfessionName();
 
+    public void revive() {hp = maxHp; alive = true; }
+    public int getAttack() {return this.attack;}
     public boolean isDead(){
         return !alive;
     }
