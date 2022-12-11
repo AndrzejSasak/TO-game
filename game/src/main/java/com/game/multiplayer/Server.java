@@ -82,9 +82,8 @@ public class Server{
             onEndRound();
         }
 
-        String testStr = ioManager.readMessage();
-        System.out.println("client message"+testStr);
-        ioManager.sendMessage("connection established");
+        System.out.println("Game ended with result: "+player1Score+" "+player2Score);
+        System.out.println(player1Score>player2Score ? "Player One won game" : "Player two won the game");
 
         serverState = ServerState.END_GAME;
     }
@@ -116,7 +115,6 @@ public class Server{
         }
 
         if(bAnyPlayerDead) {
-            //TODO:check if player2 is dead
             if(playerTwo.isDead()) {
                 player1Score++;
             }
@@ -133,14 +131,11 @@ public class Server{
     }
 
     private void proceedServerMove(){
-        playerTwo.getAttack();
-        playerTwo.takeDamage(playerOne.getAttack());
-        Messages.attackMessage(playerOne, playerTwo);
+        playerTwo.getHit(playerOne.getAttack(),playerOne, null, null);
     }
 
     private void proceedClientMove(){
-        playerOne.takeDamage(playerTwo.getAttack());
-        Messages.attackMessage(playerTwo, playerOne);
+        playerOne.getHit(playerTwo.getAttack(),playerTwo, null, null);
     }
 
     private void endGame() {

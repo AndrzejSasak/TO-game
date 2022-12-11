@@ -57,4 +57,9 @@ public abstract class Entity {
     public String getName(){
         return name;
     }
+    public String getNameInfo() {
+        if (isDead())
+            return getProfessionName() + " " + name + " (Dead)";
+        return getProfessionName() + " " + name + " ("+ hp + "/" + getMaxHp() + ")";
+    }
 }

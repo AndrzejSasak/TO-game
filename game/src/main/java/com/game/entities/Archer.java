@@ -30,18 +30,34 @@ public class Archer extends Entity {
     }
 
 
-
     @Override
     public void getHit(int attackPoints, Entity attacker, List<Entity> allFriends, List<Entity> allEnemies) {
+        if (!alive)
+            return;
+
+        if (!(attacker instanceof Wizard) && rand.nextDouble(1.) < 0.15){
+            Messages.dodgeMessage(this);
+            if (rand.nextDouble(1.) < 0.5){
+                Messages.counterattackMessage(this, attacker);
+                attacker.getHit(attack, this, allEnemies, allFriends);
+            }
+            return;
+        }
+
         hp -= attackPoints;
-        Messages.hitMessage(this, attackPoints);
-        if(hp < 0)
+        if(hp < 1){
+            hp = 0;
             alive = false;
+        }
+
+        Messages.hitMessage(this, attackPoints);
+        if(hp == 0)
+            Messages.deathMessage(this);
     }
 
     @Override
     public List<Entity> getPreferredTargets(List<Entity> allEnemies) {
-        return allEnemies.stream().filter(entity -> entity instanceof Wizard).collect(Collectors.toList());
+        return allEnemies.stream().filter(entity -> entity instanceof Wizard && !entity.isDead()).collect(Collectors.toList());
     }
 
     @Override
