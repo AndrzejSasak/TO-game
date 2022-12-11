@@ -23,10 +23,14 @@ public class Client{
     }
 
     public static void main(String[] args) throws IOException {
+        Socket clientSocket = new Socket("localhost", 5000);
+        IOManager ioManager = new IOManager(clientSocket);
+        Client newClient = new Client(clientSocket, ioManager);
 
-        //Socket clientSocket = new Socket("localhost", 5000);
+    }
+
+    public void LookForServers() throws UnknownHostException {
         int port = 5000;
-        //IOManager ioManager = new IOManager(clientSocket);
         List<InetAddress> ips = getAvailableIps();
 
         for(InetAddress valid : ips){

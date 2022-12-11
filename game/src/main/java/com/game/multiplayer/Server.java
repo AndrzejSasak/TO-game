@@ -1,5 +1,11 @@
 package com.game.multiplayer;
 
+import com.game.Messages;
+import com.game.controllers.Player;
+import com.game.entities.Archer;
+import com.game.entities.Entity;
+import com.game.entities.Wizard;
+
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.io.BufferedReader;
@@ -20,6 +26,9 @@ public class Server{
     final private static int playerNum = 1;
     private static int roundNumber = 0;
     private static NetRole netRole = NetRole.SERVER;
+
+    Entity playerOne = new Archer("Adrian", new Player());
+    Entity playerTwo = new Archer("Konrad", new Player());
 
     private static int player1Score = 0;
     private static int player2Score = 0;
@@ -63,8 +72,15 @@ public class Server{
         TimeUnit.SECONDS.sleep(3);
 
         IOManager ioManager = new IOManager(clientSocket);
-
+        beginGame();
         serverState = ServerState.GAME_IN_PROGRESS;
+
+        while(player1Score != 3 && player2Score != 3)
+        {
+            onBeginRound();
+            progressRound();
+            onEndRound();
+        }
 
         String testStr = ioManager.readMessage();
         System.out.println("client message"+testStr);
@@ -82,7 +98,6 @@ public class Server{
     private void onBeginRound() {
         roleStartedLastRound = roleStartedLastRound == NetRole.CLIENT ? NetRole.SERVER : NetRole.CLIENT;
         roundNumber++;
-        //TODO:restore players health
     }
 
     private void progressRound() {
@@ -97,25 +112,35 @@ public class Server{
                 proceedClientMove();
                 proceedServerMove();
             }
+            bAnyPlayerDead = playerOne.isDead() || playerTwo.isDead();
         }
 
         if(bAnyPlayerDead) {
             //TODO:check if player2 is dead
-            if(true) {
+            if(playerTwo.isDead()) {
                 player1Score++;
             }
             else{
                 player2Score++;
             }
+            return;
         }
     }
 
-    private void proceedServerMove(){
+    private void onEndRound(){
+        playerOne.revive();
+        playerTwo.revive();
+    }
 
+    private void proceedServerMove(){
+        playerTwo.getAttack();
+        playerTwo.takeDamage(playerOne.getAttack());
+        Messages.attackMessage(playerOne, playerTwo);
     }
 
     private void proceedClientMove(){
-
+        playerOne.takeDamage(playerTwo.getAttack());
+        Messages.attackMessage(playerTwo, playerOne);
     }
 
     private void endGame() {
