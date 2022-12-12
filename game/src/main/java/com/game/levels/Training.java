@@ -4,6 +4,7 @@ import com.game.Names;
 import com.game.battle.Battle;
 import com.game.controllers.NPC;
 import com.game.controllers.Player;
+import com.game.controllers.decorator.TrainingDummy;
 import com.game.entities.Archer;
 import com.game.entities.Entity;
 import com.game.entities.Warrior;
@@ -31,10 +32,10 @@ public class Training implements Level {
         System.out.println("You can attack him right away choosing the correct option\nor skip your turn in order to maximalize your chances of dealing critical damage\nand parring your opponents attack!" );
 
         List<Entity> friends = new ArrayList<>();
-        friends.add(new Warrior(playerName, 2, new Player()));
+        friends.add(new Warrior(playerName, 1, new Player()));
 
         List<Entity> enemies = new ArrayList<>();
-        enemies.add(new Archer(first_opponent_name, 1, new NPC()));
+        enemies.add(new Archer(first_opponent_name, 1, new TrainingDummy(new NPC())));
 
         Battle first_battle = new Battle(friends, enemies);
 
