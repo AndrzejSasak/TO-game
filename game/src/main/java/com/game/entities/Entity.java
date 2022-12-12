@@ -12,6 +12,7 @@ public abstract class Entity {
     protected int level;
     protected String professionName;
     protected int hp;
+    protected boolean boost;
     protected boolean alive;
     protected Random rand;
     protected String name;
@@ -21,15 +22,21 @@ public abstract class Entity {
         this.controller = controller;
         this.name = name;
         alive = true;
+        boost = false;
         rand = new Random();
     }
 
     public void update(List<Entity> allFriends, List<Entity> allEnemies){
         Entity target = controller.getNextTarget(this, allFriends, allEnemies);
-        if (target != null)
+        if (target != null){
             attack(target, allFriends, allEnemies);
-        else
+            boost = false;
+        }
+        else{
             Messages.passMessage(this);
+            if(rand.nextDouble(1.) < 0.9)
+                boost = true;
+        }
     }
 
     protected abstract void init(int level);
@@ -47,6 +54,7 @@ public abstract class Entity {
     public int getHp() {
         return hp;
     }
+    public boolean haveCritical(){return boost;};
     public int getMaxHp() {return maxHp;};
     public String getName(){
         return name;

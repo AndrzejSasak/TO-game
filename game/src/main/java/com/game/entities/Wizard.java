@@ -9,12 +9,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Wizard extends Entity {
-    //TODO remove
-    public Wizard(String name, EntityController controller){
-        super(name, controller);
-        this.professionName = "Wizard";
-        init(1);
-    }
     public Wizard(String name, int level ,EntityController controller){
         super(name, controller);
         this.professionName = "Wizard";
@@ -30,6 +24,11 @@ public class Wizard extends Entity {
 
     @Override
     public void attack(Entity target, List<Entity> allFriends, List<Entity> allEnemies) {
+        int attack = this.attack;
+        if (boost){
+            Messages.criticalAttackMessage();
+            attack = (int) (attack * 2.1);
+        }
         if (allEnemies.size() < 2){
             Messages.attackMessage(this, target);
             target.getHit(attack, this, allEnemies, allFriends);
@@ -51,7 +50,11 @@ public class Wizard extends Entity {
         if (!alive)
             return;
 
-        if (rand.nextDouble(1.) < 0.1){
+        boolean dodge = rand.nextDouble(1.) < 0.1;
+        if (!dodge && boost)
+            dodge = rand.nextDouble(1.) < 0.18;
+
+        if (dodge){
             Messages.dodgeMessage(this);
             if (rand.nextDouble(1.) < 0.5){
                 Messages.counterattackMessage(this, attacker);

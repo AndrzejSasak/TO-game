@@ -29,7 +29,11 @@ public class Messages {
         System.out.println(message);
     }
     public static void counterattackMessage(Entity attacker, Entity attacked){
-        String message = "Info! " + attacker.getNameInfo() + " counterattacks: " + attacked.getNameInfo() + "!";
+        String message = "Info: " + attacker.getNameInfo() + " counterattacks: " + attacked.getNameInfo() + "!";
+        System.out.println(message);
+    }
+    public static void criticalAttackMessage(){
+        String message = "Info: Critical attack!";
         System.out.println(message);
     }
 }

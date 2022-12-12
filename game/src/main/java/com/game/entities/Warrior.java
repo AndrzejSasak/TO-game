@@ -8,12 +8,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Warrior extends Entity {
-    //TODO remove
-    public Warrior(String name ,EntityController controller){
-        super(name, controller);
-        this.professionName = "Warrior";
-        init(1);
-    }
     public Warrior(String name, int level ,EntityController controller){
         super(name, controller);
         this.professionName = "Warrior";
@@ -28,6 +22,11 @@ public class Warrior extends Entity {
     }
 
     private int buffedAttack(Entity enemy){
+        int attack = this.attack;
+        if (boost){
+            Messages.criticalAttackMessage();
+            attack = (int) (attack * 2.1);
+        }
         if(enemy instanceof Archer)
             return (int) (attack * 1.2);
         return attack;
@@ -44,7 +43,11 @@ public class Warrior extends Entity {
         if (!alive)
             return;
 
-        if (!(attacker instanceof Wizard) && rand.nextDouble(1.) < 0.15){
+        boolean dodge = rand.nextDouble(1.) < 0.15;
+        if (!dodge && boost)
+            dodge = rand.nextDouble(1.) < 0.20;
+
+        if (!(attacker instanceof Wizard) && dodge){
             Messages.dodgeMessage(this);
             if (rand.nextDouble(1.) < 0.5){
                 Messages.counterattackMessage(this, attacker);
@@ -53,10 +56,10 @@ public class Warrior extends Entity {
             return;
         }
 
-        if(attacker instanceof Archer)
-            hp -= (int) (attackPoints * 0.9);
-        else
-            hp -= attackPoints;
+        int damage = attackPoints;
+        if (attacker instanceof Archer)
+            damage = (int) (attackPoints * 0.9);
+        hp -= damage;
 
         if(hp < 1){
             hp = 0;
