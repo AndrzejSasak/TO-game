@@ -25,14 +25,19 @@ public class Player implements EntityController{
     @Override
     public Entity getNextTarget(Entity entity, List<Entity> allFriends, List<Entity> allEnemies) {
         //TODO command
-        for (int i = 0; i < allFriends.size(); i++){
-            Entity target = allFriends.get(i);
+        System.out.println("--------------------------");
+        System.out.println("Your turn!\nYour team:");
+        for (Entity target : allFriends) {
             System.out.println(target.getNameInfo());
         }
-        for (int i = 0; i < allEnemies.size(); i++){
+        System.out.println("Choose option:");
+        int i;
+        for (i = 0; i < allEnemies.size(); i++){
             Entity target = allEnemies.get(i);
-            System.out.println(i + " " + target.getNameInfo());
+            System.out.println(i + ". Attack: " + target.getNameInfo());
         }
+        System.out.println(i + ". Skip turn.");
+        System.out.println("--------------------------");
         Scanner myInput = new Scanner( System.in );
         int a = myInput.nextInt();
         if(a >= allEnemies.size() || a < 0)

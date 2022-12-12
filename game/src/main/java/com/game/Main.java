@@ -1,8 +1,11 @@
 package com.game;
 
+import com.game.levels.Level;
+import com.game.levels.Training;
+
 public class Main {
    public static void main(String[] args) {
-      TestGame test = new TestGame();
-      test.play();
+      Level game = new Training("Adrian");
+      while (!game.run());
    }
 }
