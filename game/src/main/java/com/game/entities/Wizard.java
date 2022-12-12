@@ -14,6 +14,7 @@ public class Wizard extends Entity {
         this.professionName = "Wizard";
         init(level);
     }
+
     @Override
     protected void init(int level){
         this.level=level;
@@ -24,11 +25,7 @@ public class Wizard extends Entity {
 
     @Override
     public void attack(Entity target, List<Entity> allFriends, List<Entity> allEnemies) {
-        int attack = this.attack;
-        if (boost){
-            Messages.criticalAttackMessage();
-            attack = (int) (attack * 2.1);
-        }
+        int attack = criticalAttack(this.attack);
         if (allEnemies.size() < 2){
             Messages.attackMessage(this, target);
             target.getHit(attack, this, allEnemies, allFriends);
@@ -46,33 +43,13 @@ public class Wizard extends Entity {
     }
 
     @Override
-    public void getHit(int attackPoints, Entity attacker, List<Entity> allFriends, List<Entity> allEnemies) {
-        if (!alive)
-            return;
-
+    protected boolean dodge(Entity attacker){
         boolean dodge = rand.nextDouble(1.) < 0.1;
         if (!dodge && boost)
             dodge = rand.nextDouble(1.) < 0.18;
-
-        if (dodge){
-            Messages.dodgeMessage(this);
-            if (rand.nextDouble(1.) < 0.5){
-                Messages.counterattackMessage(this, attacker);
-                attacker.getHit(attack, this, allEnemies, allFriends);
-            }
-            return;
-        }
-
-        hp -= attackPoints;
-        if(hp < 1){
-            hp = 0;
-            alive = false;
-        }
-
-        Messages.hitMessage(this, attackPoints);
-        if(hp == 0)
-            Messages.deathMessage(this);
+        return dodge;
     }
+
 
     @Override
     public List<Entity> getPreferredTargets(List<Entity> allEnemies) {
