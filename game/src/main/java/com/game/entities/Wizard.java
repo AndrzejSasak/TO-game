@@ -9,11 +9,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Wizard extends Entity {
+    //TODO remove
     public Wizard(String name, EntityController controller){
         super(name, controller);
-        this.maxHp = 380;
-        this.attack = 28;
         this.professionName = "Wizard";
+        init(1);
+    }
+    public Wizard(String name, int level ,EntityController controller){
+        super(name, controller);
+        this.professionName = "Wizard";
+        init(level);
+    }
+    @Override
+    protected void init(int level){
+        this.level=level;
+        this.maxHp = (int) (380 * (1. + ((level - 1) * 0.12)));
+        this.attack = (int) (28 * (1. + ((level - 1) * 0.12)));
         this.hp = maxHp;
     }
 

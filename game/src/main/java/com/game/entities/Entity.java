@@ -9,6 +9,7 @@ import java.util.Random;
 public abstract class Entity {
     protected int maxHp;
     protected int attack;
+    protected int level;
     protected String professionName;
     protected int hp;
     protected boolean alive;
@@ -25,19 +26,20 @@ public abstract class Entity {
 
     public void update(List<Entity> allFriends, List<Entity> allEnemies){
         Entity target = controller.getNextTarget(this, allFriends, allEnemies);
-        if (target != null) {
+        if (target != null)
             attack(target, allFriends, allEnemies);
-        }
         else
             Messages.passMessage(this);
     }
 
+    protected abstract void init(int level);
     protected abstract void attack(Entity target, List<Entity> allFriends, List<Entity> allEnemies);
     public abstract void getHit(int attackPoints, Entity attacker, List<Entity> allFriends, List<Entity> allEnemies);
     public abstract List<Entity> getPreferredTargets(List<Entity> allEnemies);
 
     public String getProfessionName() {return professionName;};
-    public void revive() {hp = maxHp; alive = true; }
+    public void setLevel(int level){init(level);}
+    public void revive() {init(level); alive = true;}
     public int getAttack() {return attack;}
     public boolean isDead(){
         return !alive;
@@ -51,7 +53,7 @@ public abstract class Entity {
     }
     public String getNameInfo() {
         if (isDead())
-            return getProfessionName() + " " + name + " (Dead)";
-        return getProfessionName() + " " + name + " ("+ hp + "/" + getMaxHp() + ")";
+            return getProfessionName() + " " + name + " [" + level + "]" + " (Dead)";
+        return getProfessionName() + " " + name + " [" + level + "]" + " ("+ hp + "/" + getMaxHp() + ")";
     }
 }

@@ -8,11 +8,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Warrior extends Entity {
-    public Warrior(String name, EntityController controller){
+    //TODO remove
+    public Warrior(String name ,EntityController controller){
         super(name, controller);
-        this.maxHp = 350;
-        this.attack = 20;
         this.professionName = "Warrior";
+        init(1);
+    }
+    public Warrior(String name, int level ,EntityController controller){
+        super(name, controller);
+        this.professionName = "Warrior";
+        init(level);
+    }
+    @Override
+    protected void init(int level){
+        this.level=level;
+        this.maxHp = (int) (350 * (1. + ((level - 1) * 0.12)));
+        this.attack = (int) (20 * (1. + ((level - 1) * 0.12)));
         this.hp = maxHp;
     }
 

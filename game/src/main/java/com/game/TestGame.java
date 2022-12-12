@@ -16,10 +16,10 @@ public class TestGame {
     public TestGame(){
         myTeam = new ArrayList<>();
         enemies = new ArrayList<>();
-        myTeam.add(new Wizard("Adrian", new NPC()));
-        myTeam.add(new Warrior("Tomek", new NPC()));
-        enemies.add(new Archer("Konrad", new NPC()));
-        enemies.add(new Warrior("Andrzej", new NPC()));
+        myTeam.add(new Wizard("Adrian",1, new NPC()));
+        myTeam.add(new Warrior("Tomek", 3,new NPC()));
+        enemies.add(new Archer("Konrad",2, new NPC()));
+        enemies.add(new Warrior("Andrzej", 3, new NPC()));
     }
     public void play(){
         Battle battle = new Battle(myTeam, enemies);
