@@ -6,7 +6,7 @@ public class SelectModeCommand implements ICommand {
 
     private GameMode gameMode;
 
-    SelectModeCommand(GameMode gameMode) {
+    public SelectModeCommand(GameMode gameMode) {
         this.gameMode = gameMode;
     }
 
