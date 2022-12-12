@@ -1,4 +1,4 @@
-package com.game.levels.battle;
+package com.game.battle;
 
 import com.game.entities.Entity;
 

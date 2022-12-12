@@ -14,7 +14,7 @@ public abstract class Entity {
     protected boolean alive;
     protected Random rand;
     protected String name;
-    EntityController controller;
+    protected EntityController controller;
 
     protected Entity(String name, EntityController controller){
         this.controller = controller;
@@ -35,17 +35,17 @@ public abstract class Entity {
     protected abstract void attack(Entity target, List<Entity> allFriends, List<Entity> allEnemies);
     public abstract void getHit(int attackPoints, Entity attacker, List<Entity> allFriends, List<Entity> allEnemies);
     public abstract List<Entity> getPreferredTargets(List<Entity> allEnemies);
-    public abstract int getMaxHp();
-    public abstract String getProfessionName();
 
+    public String getProfessionName() {return professionName;};
     public void revive() {hp = maxHp; alive = true; }
-    public int getAttack() {return this.attack;}
+    public int getAttack() {return attack;}
     public boolean isDead(){
         return !alive;
     }
     public int getHp() {
         return hp;
     }
+    public int getMaxHp() {return maxHp;};
     public String getName(){
         return name;
     }

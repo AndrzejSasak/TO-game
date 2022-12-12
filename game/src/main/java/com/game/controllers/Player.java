@@ -25,7 +25,6 @@ public class Player implements EntityController{
     @Override
     public Entity getNextTarget(Entity entity, List<Entity> allFriends, List<Entity> allEnemies) {
         //TODO command
-
         for (int i = 0; i < allFriends.size(); i++){
             Entity target = allFriends.get(i);
             System.out.println(target.getNameInfo());

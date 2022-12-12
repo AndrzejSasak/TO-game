@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Wizard extends Entity {
-
-
     public Wizard(String name, EntityController controller){
         super(name, controller);
         this.maxHp = 380;
@@ -66,15 +64,4 @@ public class Wizard extends Entity {
     public List<Entity> getPreferredTargets(List<Entity> allEnemies) {
         return allEnemies.stream().filter(entity -> entity instanceof Warrior && !entity.isDead()).collect(Collectors.toList());
     }
-
-    @Override
-    public int getMaxHp() {
-        return maxHp;
-    }
-
-    @Override
-    public String getProfessionName() {
-        return professionName;
-    }
-
 }

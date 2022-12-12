@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Warrior extends Entity {
-
-
     public Warrior(String name, EntityController controller){
         super(name, controller);
         this.maxHp = 350;
@@ -22,11 +20,6 @@ public class Warrior extends Entity {
         if(enemy instanceof Archer)
             return (int) (attack * 1.2);
         return attack;
-    }
-    private int resistance(int attackPoints, Entity enemy){
-        if(enemy instanceof Archer)
-            return (int) (attackPoints * 0.9);
-        return attackPoints;
     }
 
     @Override
@@ -67,15 +60,5 @@ public class Warrior extends Entity {
     @Override
     public List<Entity> getPreferredTargets(List<Entity> allEnemies) {
         return allEnemies.stream().filter(entity -> entity instanceof Archer && !entity.isDead()).collect(Collectors.toList());
-    }
-
-    @Override
-    public int getMaxHp() {
-        return maxHp;
-    }
-
-    @Override
-    public String getProfessionName() {
-        return professionName;
     }
 }

@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Archer extends Entity {
-
-
     public Archer(String name, EntityController controller){
         super(name, controller);
         this.maxHp = 350;
@@ -28,7 +26,6 @@ public class Archer extends Entity {
         Messages.attackMessage(this, target);
         target.getHit(buffedAttack(target), this, allEnemies, allFriends);
     }
-
 
     @Override
     public void getHit(int attackPoints, Entity attacker, List<Entity> allFriends, List<Entity> allEnemies) {
@@ -58,15 +55,5 @@ public class Archer extends Entity {
     @Override
     public List<Entity> getPreferredTargets(List<Entity> allEnemies) {
         return allEnemies.stream().filter(entity -> entity instanceof Wizard && !entity.isDead()).collect(Collectors.toList());
-    }
-
-    @Override
-    public int getMaxHp() {
-        return maxHp;
-    }
-
-    @Override
-    public String getProfessionName() {
-        return professionName;
     }
 }
