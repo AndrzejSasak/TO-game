@@ -9,18 +9,26 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Wizard extends Entity {
-
-
-    public Wizard(String name, EntityController controller){
+    public Wizard(String name, int level ,EntityController controller){
         super(name, controller);
-        this.maxHp = 380;
-        this.attack = 28;
         this.professionName = "Wizard";
+        init(level);
+    }
+    @Override
+    protected void init(int level){
+        this.level=level;
+        this.maxHp = (int) (380 * (1. + ((level - 1) * 0.12)));
+        this.attack = (int) (28 * (1. + ((level - 1) * 0.12)));
         this.hp = maxHp;
     }
 
     @Override
     public void attack(Entity target, List<Entity> allFriends, List<Entity> allEnemies) {
+        int attack = this.attack;
+        if (boost){
+            Messages.criticalAttackMessage();
+            attack = (int) (attack * 2.1);
+        }
         if (allEnemies.size() < 2){
             Messages.attackMessage(this, target);
             target.getHit(attack, this, allEnemies, allFriends);
@@ -42,7 +50,11 @@ public class Wizard extends Entity {
         if (!alive)
             return;
 
-        if (rand.nextDouble(1.) < 0.1){
+        boolean dodge = rand.nextDouble(1.) < 0.1;
+        if (!dodge && boost)
+            dodge = rand.nextDouble(1.) < 0.18;
+
+        if (dodge){
             Messages.dodgeMessage(this);
             if (rand.nextDouble(1.) < 0.5){
                 Messages.counterattackMessage(this, attacker);
@@ -66,15 +78,4 @@ public class Wizard extends Entity {
     public List<Entity> getPreferredTargets(List<Entity> allEnemies) {
         return allEnemies.stream().filter(entity -> entity instanceof Warrior && !entity.isDead()).collect(Collectors.toList());
     }
-
-    @Override
-    public int getMaxHp() {
-        return maxHp;
-    }
-
-    @Override
-    public String getProfessionName() {
-        return professionName;
-    }
-
 }

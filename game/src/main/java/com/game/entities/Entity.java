@@ -9,49 +9,59 @@ import java.util.Random;
 public abstract class Entity {
     protected int maxHp;
     protected int attack;
+    protected int level;
     protected String professionName;
     protected int hp;
+    protected boolean boost;
     protected boolean alive;
     protected Random rand;
     protected String name;
-    EntityController controller;
+    protected EntityController controller;
 
     protected Entity(String name, EntityController controller){
         this.controller = controller;
         this.name = name;
         alive = true;
+        boost = false;
         rand = new Random();
     }
 
     public void update(List<Entity> allFriends, List<Entity> allEnemies){
         Entity target = controller.getNextTarget(this, allFriends, allEnemies);
-        if (target != null) {
+        if (target != null){
             attack(target, allFriends, allEnemies);
+            boost = false;
         }
-        else
+        else{
             Messages.passMessage(this);
+            if(rand.nextDouble(1.) < 0.9)
+                boost = true;
+        }
     }
 
+    protected abstract void init(int level);
     protected abstract void attack(Entity target, List<Entity> allFriends, List<Entity> allEnemies);
     public abstract void getHit(int attackPoints, Entity attacker, List<Entity> allFriends, List<Entity> allEnemies);
     public abstract List<Entity> getPreferredTargets(List<Entity> allEnemies);
-    public abstract int getMaxHp();
-    public abstract String getProfessionName();
 
-    public void revive() {hp = maxHp; alive = true; }
-    public int getAttack() {return this.attack;}
+    public String getProfessionName() {return professionName;};
+    public void setLevel(int level){init(level);}
+    public void revive() {init(level); alive = true;}
+    public int getAttack() {return attack;}
     public boolean isDead(){
         return !alive;
     }
     public int getHp() {
         return hp;
     }
+    public boolean haveCritical(){return boost;};
+    public int getMaxHp() {return maxHp;};
     public String getName(){
         return name;
     }
     public String getNameInfo() {
         if (isDead())
-            return getProfessionName() + " " + name + " (Dead)";
-        return getProfessionName() + " " + name + " ("+ hp + "/" + getMaxHp() + ")";
+            return getProfessionName() + " " + name + " [" + level + "]" + " (Dead)";
+        return getProfessionName() + " " + name + " [" + level + "]" + " ("+ hp + "/" + getMaxHp() + ")";
     }
 }

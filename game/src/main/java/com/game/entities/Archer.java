@@ -7,17 +7,33 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Archer extends Entity {
-
-
+    //TODO remove
     public Archer(String name, EntityController controller){
         super(name, controller);
-        this.maxHp = 350;
-        this.attack = 20;
         this.professionName = "Archer";
+        init(1);
+    }
+
+    public Archer(String name, int level ,EntityController controller){
+        super(name, controller);
+        this.professionName = "Archer";
+        init(level);
+    }
+
+    @Override
+    protected void init(int level){
+        this.level=level;
+        this.maxHp = (int) (350 * (1. + ((level - 1) * 0.12)));
+        this.attack = (int) (20 * (1. + ((level - 1) * 0.12)));
         this.hp = maxHp;
     }
 
     private int buffedAttack(Entity enemy){
+        int attack = this.attack;
+        if (boost){
+            Messages.criticalAttackMessage();
+            attack = (int) (attack * 2.1);
+        }
         if(enemy instanceof Wizard)
             return (int) (attack * 1.2);
         return attack;
@@ -29,13 +45,16 @@ public class Archer extends Entity {
         target.getHit(buffedAttack(target), this, allEnemies, allFriends);
     }
 
-
     @Override
     public void getHit(int attackPoints, Entity attacker, List<Entity> allFriends, List<Entity> allEnemies) {
         if (!alive)
             return;
 
-        if (!(attacker instanceof Wizard) && rand.nextDouble(1.) < 0.15){
+        boolean dodge = rand.nextDouble(1.) < 0.15;
+        if (!dodge && boost)
+            dodge = rand.nextDouble(1.) < 0.20;
+
+        if (!(attacker instanceof Wizard) && dodge){
             Messages.dodgeMessage(this);
             if (rand.nextDouble(1.) < 0.5){
                 Messages.counterattackMessage(this, attacker);
@@ -58,15 +77,5 @@ public class Archer extends Entity {
     @Override
     public List<Entity> getPreferredTargets(List<Entity> allEnemies) {
         return allEnemies.stream().filter(entity -> entity instanceof Wizard && !entity.isDead()).collect(Collectors.toList());
-    }
-
-    @Override
-    public int getMaxHp() {
-        return maxHp;
-    }
-
-    @Override
-    public String getProfessionName() {
-        return professionName;
     }
 }
