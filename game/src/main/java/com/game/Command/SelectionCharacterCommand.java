@@ -6,7 +6,7 @@ public class SelectionCharacterCommand implements ICommand{
     Entity currentCharacter;
     Entity newCharacter;
 
-    SelectionCharacterCommand(Entity currentCharacter, Entity newCharacter) {
+    public SelectionCharacterCommand(Entity currentCharacter, Entity newCharacter) {
         this.currentCharacter = currentCharacter;
         this.newCharacter = newCharacter;
     }
