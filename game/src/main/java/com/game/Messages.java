@@ -36,4 +36,7 @@ public class Messages {
         String message = "Info: Critical attack!";
         System.out.println(message);
     }
+    public static void displayVerticalLine() {
+        System.out.println("----------------------------------------------");
+    }
 }
