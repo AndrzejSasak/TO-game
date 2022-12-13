@@ -3,6 +3,7 @@ package com.game.menu;
 import com.game.Command.CommandExecutor;
 import com.game.Command.LeaderboardCommand;
 import com.game.Command.SelectModeCommand;
+import com.game.controllers.Player;
 import com.game.gamemode.GameMode;
 
 import java.util.Scanner;
@@ -10,21 +11,26 @@ import java.util.Scanner;
 public class Menu {
     static boolean isRunning = true;
     private static final CommandExecutor commandExecutor = new CommandExecutor();
+    private Player player;
 
-    public static void printMenu() {
+    public Menu(Player player) {
+        this.player = player;
+    }
+
+    public void printMenu() {
         System.out.println("1. Singleplayer");
         System.out.println("2. Multiplayer");
         System.out.println("3. Leader");
         System.out.println("4. Exit");
     }
 
-    public static void printMultiplayerMenu() {
+    public void printMultiplayerMenu() {
         System.out.println("1. Join game");
         System.out.println("2. Host game");
         System.out.println("3. Back to main menu");
     }
 
-    public static void run() {
+    public void run() {
         Scanner inputReader = new Scanner(System.in);
         String command;
         printMenu();
@@ -40,7 +46,7 @@ public class Menu {
                     commandExecutor.executeCommand(selectMultiModeCommand);
                     break;
                 case "3":
-                    commandExecutor.executeCommand(new LeaderboardCommand());
+                    commandExecutor.executeCommand(new LeaderboardCommand(player));
                     break;
                 case "4":
                     Menu.isRunning = false;
