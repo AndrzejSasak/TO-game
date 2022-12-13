@@ -1,11 +1,13 @@
 package com.game;
 
-import com.game.levels.Level;
-import com.game.levels.Training;
+import com.game.entities.Entity;
+import com.game.sharedUserInterface.Login;
+import com.game.sharedUserInterface.Menu;
 
 public class Main {
    public static void main(String[] args) {
-      Level game = new Training("Adrian");
-      while (!game.run());
+      Entity entity = new Login().createPlayer();
+      Menu menu = new Menu(entity);
+      menu.run();
    }
 }

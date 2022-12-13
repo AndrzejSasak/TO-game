@@ -120,6 +120,8 @@ public abstract class Entity {
         return name;
     }
 
+    public EntityController getController() { return controller;}
+
     public String getNameInfo() {
         if (isDead())
             return getProfessionName() + " " + name + " [" + level + "]" + " (Dead)";

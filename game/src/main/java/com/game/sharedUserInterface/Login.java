@@ -10,14 +10,13 @@ public class Login {
     Entity entity;
     Player playerController = new Player();
 
+
     public Entity createPlayer() {
         Scanner inputReader = new Scanner(System.in);
         System.out.print("Type player login: ");
         String login = inputReader.nextLine();
         playerController.setLogin(login);
-        SelectEntityType selectEntityType = new SelectEntityType(entity);
-        selectEntityType.selectPlayerEntity(playerController);
-        entity = selectEntityType.getEntity();
+        entity = new SelectEntityType().createNewEntity(entity, playerController);
         return entity;
     }
 }
