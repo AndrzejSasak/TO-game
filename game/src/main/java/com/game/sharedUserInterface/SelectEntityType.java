@@ -50,6 +50,10 @@ public class SelectEntityType {
         this.newEntity = entity;
     }
 
+    public Entity getEntity() {
+        return entity;
+    }
+
     private void displayEntityTypes() {
         System.out.println("1. Archer (can dodge attack)");
         System.out.println("2. Warrior (can block attack)");
