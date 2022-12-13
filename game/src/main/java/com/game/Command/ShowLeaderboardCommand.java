@@ -5,9 +5,9 @@ import com.game.leaderboard.Leaderboard;
 import com.game.leaderboard.LeaderboardParserProxy;
 import jakarta.xml.bind.JAXBException;
 
-public class LeaderboardCommand implements ICommand{
+public class ShowLeaderboardCommand implements ICommand{
     private Player player;
-    public LeaderboardCommand(Player player) {
+    public ShowLeaderboardCommand(Player player) {
         this.player = player;
     }
 
