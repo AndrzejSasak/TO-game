@@ -8,11 +8,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Warrior extends Entity {
+    public Warrior(String name, EntityController controller){
+        super(name, controller);
+        this.professionName = "Archer";
+        init(1);
+    }
+
     public Warrior(String name, int level ,EntityController controller){
         super(name, controller);
         this.professionName = "Warrior";
         init(level);
     }
+
     @Override
     protected void init(int level){
         this.level=level;

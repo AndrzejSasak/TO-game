@@ -9,6 +9,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Wizard extends Entity {
+    public Wizard(String name, EntityController controller){
+        super(name, controller);
+        this.professionName = "Archer";
+        init(1);
+    }
+
     public Wizard(String name, int level ,EntityController controller){
         super(name, controller);
         this.professionName = "Wizard";

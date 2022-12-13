@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Archer extends Entity {
-    //TODO remove
     public Archer(String name, EntityController controller){
         super(name, controller);
         this.professionName = "Archer";
