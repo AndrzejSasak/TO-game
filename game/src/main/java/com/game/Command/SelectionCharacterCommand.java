@@ -1,10 +1,12 @@
 package com.game.Command;
 
-public class SelectionCharacterCommand implements ICommand{
-    Object currentCharacter;
-    Object newCharacter;
+import com.game.entities.Entity;
 
-    SelectionCharacterCommand(Object currentCharacter, Object newCharacter) {
+public class SelectionCharacterCommand implements ICommand{
+    Entity currentCharacter;
+    Entity newCharacter;
+
+    SelectionCharacterCommand(Entity currentCharacter, Entity newCharacter) {
         this.currentCharacter = currentCharacter;
         this.newCharacter = newCharacter;
     }
