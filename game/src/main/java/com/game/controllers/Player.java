@@ -2,6 +2,7 @@ package com.game.controllers;
 
 import com.game.Messages;
 import com.game.entities.Entity;
+import com.game.sharedUserInterface.LocalMessages;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -26,7 +27,7 @@ public class Player implements EntityController{
     @Override
     public Entity getNextTarget(Entity entity, List<Entity> allFriends, List<Entity> allEnemies) {
         //TODO command
-        Messages.displayVerticalLine();
+        LocalMessages.displayVerticalLine();
         System.out.println("Your turn!\nYour team:");
         for (Entity target : allFriends) {
             System.out.println(target.getNameInfo());
@@ -38,7 +39,7 @@ public class Player implements EntityController{
             System.out.println(i + ". Attack: " + target.getNameInfo());
         }
         System.out.println(i + ". Skip turn.");
-        Messages.displayVerticalLine();
+        LocalMessages.displayVerticalLine();
         Scanner myInput = new Scanner( System.in );
         int a = myInput.nextInt();
         if(a >= allEnemies.size() || a < 0)
