@@ -1,48 +1,61 @@
 package com.game.entities;
 
 import com.game.Messages;
-import com.game.controllers.EntityController;
+import com.game.controllers.AbstractEntityController;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 public abstract class Entity {
+
     protected int maxHp;
-    protected int attack;
+    protected int attackPoints;
     protected int level;
-    protected String professionName;
     protected int hp;
-    protected boolean boost;
-    protected boolean alive;
+    protected boolean hasBoost;
+    protected boolean isAlive;
     protected Random rand;
     protected String name;
-    protected EntityController controller;
-    protected Entity(String name, EntityController controller){
+    protected String professionName;
+    protected AbstractEntityController controller;
+
+    protected Entity(String name, AbstractEntityController controller) {
         this.controller = controller;
         this.name = name;
-        alive = true;
-        boost = false;
+        isAlive = true;
+        hasBoost = false;
         rand = new Random();
     }
 
     public void update(List<Entity> allFriends, List<Entity> allEnemies){
-        Entity target = controller.getNextTarget(this, allFriends, allEnemies);
-        if (target != null){
-            attack(target, allFriends, allEnemies);
-            boost = false;
-        }
-        else{
+        Optional<Entity> target = controller.getNextTarget(this, allFriends, allEnemies);
+
+        if(target.isPresent()) {
+            attack(target.get(), allFriends, allEnemies);
+            hasBoost = false;
+        } else {
             Messages.passMessage(this);
-            if(rand.nextDouble(1.) < 0.9)
-                boost = true;
+            if(rand.nextDouble(1.0) < 0.9) {
+                hasBoost = true;
+            }
         }
+
+    }
+
+    protected void attack(Entity target, List<Entity> allFriends, List<Entity> allEnemies) {
+        int attack = criticalAttack(this.attackPoints);
+        attack = boostedAttack(attack, target);
+        Messages.attackMessage(this, target);
+        target.getHit(attack, this, allEnemies, allFriends);
     }
 
     protected int criticalAttack(int attack){
-        if (boost){
+        if (hasBoost) {
             Messages.criticalAttackMessage();
             attack = (int) (attack * 2.1);
         }
+
         return attack;
     }
 
@@ -52,18 +65,14 @@ public abstract class Entity {
 
     protected abstract void init(int level);
 
-    protected void attack(Entity target, List<Entity> allFriends, List<Entity> allEnemies){
-        int attack = criticalAttack(this.attack);
-        attack = boostedAttack(attack, target);
-        Messages.attackMessage(this, target);
-        target.getHit(attack, this, allEnemies, allFriends);
-    }
+    protected boolean dodge(Entity attacker) {
+        boolean dodged = rand.nextDouble(1.) < 0.15;
 
-    protected boolean dodge(){
-        boolean dodge = rand.nextDouble(1.) < 0.15;
-        if (!dodge && boost)
-            dodge = rand.nextDouble(1.) < 0.20;
-        return dodge;
+        if (!dodged && hasBoost) {
+            dodged = rand.nextDouble(1.) < 0.20;
+        }
+
+        return dodged;
     }
 
     protected int countDamage(int attackPoints, Entity attacker){
@@ -71,56 +80,70 @@ public abstract class Entity {
     }
 
     public void getHit(int attackPoints, Entity attacker, List<Entity> allFriends, List<Entity> allEnemies){
-        if (!alive)
+        if (!isAlive) {
             return;
-        boolean dodge = dodge();
-        if (dodge){
+        }
+
+        if (dodge(attacker)){
             Messages.dodgeMessage(this);
-            if (rand.nextDouble(1.) < 0.5){
+            if (rand.nextDouble(1.) < 0.5) {
                 Messages.counterattackMessage(this, attacker);
-                attacker.getHit(attack, this, allEnemies, allFriends);
+                attacker.getHit(this.attackPoints, this, allEnemies, allFriends);
             }
             return;
         }
+
         int damage = countDamage(attackPoints, attacker);
         hp -= damage;
         if(hp < 1){
             hp = 0;
-            alive = false;
+            isAlive = false;
         }
+
         Messages.hitMessage(this, attackPoints);
-        if(hp == 0)
+        if(hp == 0) {
             Messages.deathMessage(this);
+        }
+
     }
 
     public abstract List<Entity> getPreferredTargets(List<Entity> allEnemies);
 
-    public String getProfessionName() {return professionName;};
+    public String getProfessionName() {
+        return professionName;
+    }
 
-    public void setLevel(int level){init(level);}
+    public void setLevel(int level){
+        init(level);
+    }
 
-    public void revive() {init(level); alive = true;}
+    public void revive() {
+        init(level); isAlive = true;
+    }
 
-    //TODO change name to getAttackPoints
-    public int getAttack() {return attack;}
+    public int getAttackPoints() {
+        return attackPoints;
+    }
 
     public boolean isDead(){
-        return !alive;
+        return !isAlive;
     }
 
     public int getHp() {
         return hp;
     }
 
-    public boolean haveCritical(){return boost;};
+    public boolean haveCritical(){
+        return hasBoost;
+    }
 
-    public int getMaxHp() {return maxHp;};
+    public int getMaxHp() {return maxHp;}
 
     public String getName(){
         return name;
     }
 
-    public EntityController getController() { return controller;}
+    public AbstractEntityController getController() { return controller;}
 
     public String getNameInfo() {
         if (isDead())

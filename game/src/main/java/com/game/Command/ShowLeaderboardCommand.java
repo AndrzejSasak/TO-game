@@ -1,20 +1,20 @@
 package com.game.Command;
 
-import com.game.controllers.Player;
+import com.game.controllers.PlayerEntityController;
 import com.game.leaderboard.Leaderboard;
 import com.game.leaderboard.LeaderboardParserProxy;
 import jakarta.xml.bind.JAXBException;
 
 public class ShowLeaderboardCommand implements ICommand{
-    private Player player;
-    public ShowLeaderboardCommand(Player player) {
-        this.player = player;
+    private PlayerEntityController playerEntityController;
+    public ShowLeaderboardCommand(PlayerEntityController playerEntityController) {
+        this.playerEntityController = playerEntityController;
     }
 
     @Override
     public void execute() {
         try{
-            Leaderboard leaderboard = new LeaderboardParserProxy(player).readLeaderboard();
+            Leaderboard leaderboard = new LeaderboardParserProxy(playerEntityController).readLeaderboard();
             System.out.println(leaderboard.toString());
         }
         catch (JAXBException ex) {
