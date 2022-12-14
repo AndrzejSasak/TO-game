@@ -59,7 +59,7 @@ public abstract class Entity {
         target.getHit(attack, this, allEnemies, allFriends);
     }
 
-    protected boolean dodge(Entity attacker){
+    protected boolean dodge(){
         boolean dodge = rand.nextDouble(1.) < 0.15;
         if (!dodge && boost)
             dodge = rand.nextDouble(1.) < 0.20;
@@ -73,7 +73,7 @@ public abstract class Entity {
     public void getHit(int attackPoints, Entity attacker, List<Entity> allFriends, List<Entity> allEnemies){
         if (!alive)
             return;
-        boolean dodge = dodge(attacker);
+        boolean dodge = dodge();
         if (dodge){
             Messages.dodgeMessage(this);
             if (rand.nextDouble(1.) < 0.5){

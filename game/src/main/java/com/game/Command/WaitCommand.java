@@ -1,14 +1,16 @@
 package com.game.Command;
 
-public class WaitCommand implements ICommand {
-    private Object player;
+import com.game.entities.Entity;
 
-    WaitCommand(Object player) {
-        this.player = player;
+public class WaitCommand implements ICommand {
+    private Entity entity;
+
+    WaitCommand(Entity entity) {
+        this.entity = entity;
     }
 
     @Override
     public void execute() {
-        //TODO: wait logic (raise critic to 100%)
+        entity
     }
 }
