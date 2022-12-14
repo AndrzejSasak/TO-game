@@ -42,11 +42,11 @@ public class Menu {
             command = inputReader.nextLine();
             switch (command) {
                 case "1":
-                    SelectModeCommand selectSingleModeCommand = new SelectModeCommand(GameMode.SINGLEPLAYER);
+                    SelectModeCommand selectSingleModeCommand = new SelectModeCommand(GameMode.SINGLEPLAYER, player);
                     commandExecutor.executeCommand(selectSingleModeCommand);
                     break;
                 case "2":
-                    SelectModeCommand selectMultiModeCommand = new SelectModeCommand(GameMode.MULTIPLAYER);
+                    SelectModeCommand selectMultiModeCommand = new SelectModeCommand(GameMode.MULTIPLAYER, player);
                     commandExecutor.executeCommand(selectMultiModeCommand);
                     break;
                 case "3":
