@@ -1,6 +1,6 @@
 package com.game.leaderboard;
 
-import com.game.controllers.Player;
+import com.game.entities.User;
 import jakarta.xml.bind.annotation.*;
 
 import java.util.Comparator;
@@ -11,33 +11,32 @@ import java.util.TreeSet;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Leaderboard {
 
-    @XmlElementWrapper(name="Players")
-    @XmlElement(name="Player")
-    private Set<Player> players;
+    @XmlElementWrapper(name="Users")
+    @XmlElement(name="User")
+    private Set<User> users;
 
     public Leaderboard() {
-        this.players = new TreeSet<>(Comparator.comparing(Player::getHighScore).reversed());
+        this.users = new TreeSet<>(Comparator.comparing(User::getHighScore).reversed());
     }
 
-    public Set<Player> getPlayers() {
-        return players;
+    public Set<User> getUsers() {
+        return users;
     }
 
-    public void setPlayers(Set<Player> players) {
-        this.players = players;
+    public void setUsers(Set<User> playerEntityControllers) {
+        this.users = playerEntityControllers;
     }
 
-
-    public void addPlayer(Player player) {
-        this.players.add(player);
+    public void addUser(User user) {
+        this.users.add(user);
     }
 
     @Override
     public String toString() {
         StringBuilder leaderboardBuilder = new StringBuilder("Leaderboard: \n");
 
-        for(Player player : players) {
-            leaderboardBuilder.append(player.toString()).append("\n");
+        for(User user : users) {
+            leaderboardBuilder.append(user.toString()).append("\n");
         }
 
         return leaderboardBuilder.toString();

@@ -1,22 +1,14 @@
 package com.game.multiplayer;
 
-import com.game.Messages;
-import com.game.controllers.Player;
+import com.game.controllers.PlayerEntityController;
 import com.game.entities.Archer;
 import com.game.entities.Entity;
-import com.game.entities.Wizard;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 //listen server
 public class Server{
@@ -27,8 +19,8 @@ public class Server{
     private static int roundNumber = 0;
     private static NetRole netRole = NetRole.SERVER;
 
-    Entity playerOne = new Archer("Adrian", new Player());
-    Entity playerTwo = new Archer("Konrad", new Player());
+    Entity playerOne = new Archer("Adrian", new PlayerEntityController());
+    Entity playerTwo = new Archer("Konrad", new PlayerEntityController());
 
     private static int player1Score = 0;
     private static int player2Score = 0;
@@ -131,11 +123,11 @@ public class Server{
     }
 
     private void proceedServerMove(){
-        playerTwo.getHit(playerOne.getAttack(),playerOne, null, null);
+        playerTwo.getHit(playerOne.getAttackPoints(),playerOne, null, null);
     }
 
     private void proceedClientMove(){
-        playerOne.getHit(playerTwo.getAttack(),playerTwo, null, null);
+        playerOne.getHit(playerTwo.getAttackPoints(),playerTwo, null, null);
     }
 
     private void endGame() {

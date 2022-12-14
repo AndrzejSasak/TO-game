@@ -3,7 +3,7 @@ package com.game.sharedUserInterface;
 import com.game.Command.CommandExecutor;
 import com.game.Command.ShowLeaderboardCommand;
 import com.game.Command.SelectModeCommand;
-import com.game.controllers.Player;
+import com.game.controllers.PlayerEntityController;
 import com.game.entities.Entity;
 import com.game.gamemode.GameMode;
 
@@ -50,7 +50,7 @@ public class Menu {
                     commandExecutor.executeCommand(selectMultiModeCommand);
                     break;
                 case "3":
-                    commandExecutor.executeCommand(new ShowLeaderboardCommand((Player) player.getController()));
+                    commandExecutor.executeCommand(new ShowLeaderboardCommand((PlayerEntityController) player.getController()));
                     break;
                 case "4":
                     player = new SelectEntityType().updateEntity(player);

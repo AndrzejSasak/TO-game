@@ -2,8 +2,8 @@ package com.game.levels;
 
 import com.game.Names;
 import com.game.battle.Battle;
-import com.game.controllers.NPC;
-import com.game.controllers.Player;
+import com.game.controllers.NPCEntityController;
+import com.game.controllers.PlayerEntityController;
 import com.game.controllers.decorator.TrainingDummy;
 import com.game.entities.Archer;
 import com.game.entities.Entity;
@@ -38,8 +38,9 @@ public class Training implements Level {
         System.out.println("You can attack him right away choosing the correct option\nor skip your turn in order " +
                 "to maximalize your chances of dealing critical damage\nand parring your opponents attack!" );
 
-        List<Entity> friends = List.of(new Warrior(playerName, 1, new Player()));
-        List<Entity> enemies = List.of(new Archer(firstOpponentName, 1, new TrainingDummy(new NPC())));
+        List<Entity> friends = List.of(new Warrior(playerName, 1, new PlayerEntityController()));
+        List<Entity> enemies
+                = List.of(new Archer(firstOpponentName, 1, new TrainingDummy(new NPCEntityController())));
 
         Battle battle = new Battle.Builder()
                 .teamOne(friends)
@@ -56,12 +57,12 @@ public class Training implements Level {
                 " attack weaker or stronger enemies first!");
         System.out.println("In this battle you will face multiple enemies!");
 
-        List<Entity> friends = List.of(new Wizard(playerName, 20, new Player()));
+        List<Entity> friends = List.of(new Wizard(playerName, 20, new PlayerEntityController()));
         List<Entity> enemies = List.of(
-                new Archer(names.getRandomName(), 1, new NPC()),
-                new Archer(names.getRandomName(), 1, new NPC()),
-                new Archer(names.getRandomName(), 4, new NPC()),
-                new Archer(names.getRandomName(), 1, new NPC())
+                new Archer(names.getRandomName(), 1, new NPCEntityController()),
+                new Archer(names.getRandomName(), 1, new NPCEntityController()),
+                new Archer(names.getRandomName(), 4, new NPCEntityController()),
+                new Archer(names.getRandomName(), 1, new NPCEntityController())
         );
 
         Battle battle = new Battle.Builder()

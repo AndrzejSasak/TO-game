@@ -2,7 +2,6 @@ package com.game.battle;
 
 import com.game.entities.Entity;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
