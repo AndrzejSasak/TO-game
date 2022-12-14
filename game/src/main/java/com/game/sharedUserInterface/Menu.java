@@ -23,7 +23,7 @@ public class Menu {
         System.out.println("1. Singleplayer");
         System.out.println("2. Multiplayer");
         System.out.println("3. Leaderboard");
-        System.out.println("4. Select character class:");
+        System.out.println("4. Select character class");
         System.out.println("5. Exit");
     }
 

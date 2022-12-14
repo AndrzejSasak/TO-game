@@ -44,27 +44,35 @@ public class SelectEntityType {
         Scanner inputReader = new Scanner(System.in);
         displayEntityTypes();
         while( !selection ) {
-            String input = inputReader.nextLine();
-            switch (input) {
-                case "1":
-                    setNewEntity(new Archer(entity.getName(), playerController ));
-                    selection = true;
-                    break;
-                case "2":
-                    setNewEntity(new Warrior(entity.getName(), playerController ));
-                    selection = true;
-                    break;
-                case "3":
-                    setNewEntity(new Wizard(entity.getName(), playerController ));
-                    selection = true;
-                    break;
-                default:
-                    System.out.println("Type valid option(number)");
-                    break;
+            String input[] = inputReader.nextLine().split("\s");
+            if(!isEntity() && input.length != 2) {
+                System.out.println("Provide name for player!");
             }
+            else {
+                switch (input[0]) {
+                    case "1":
+                        setNewEntity(new Archer(isEntity() ? entity.getName() : input[1], playerController ));
+                        selection = true;
+                        break;
+                    case "2":
+                        setNewEntity(new Warrior(isEntity() ? entity.getName() : input[1], playerController ));
+                        selection = true;
+                        break;
+                    case "3":
+                        setNewEntity(new Wizard(isEntity() ? entity.getName() : input[1], playerController ));
+                        selection = true;
+                        break;
+                    default:
+                        System.out.println("Type valid option(number)");
+                        break;
+                }
+            }
+
         }
         CommandExecutor commandExecutor = new CommandExecutor();
-        commandExecutor.executeCommand(new SelectionCharacterCommand(this.entity, this.newEntity));
+        SelectionCharacterCommand selectionCharacterCommand = new SelectionCharacterCommand(this.entity, this.newEntity);
+        commandExecutor.executeCommand(selectionCharacterCommand);
+        this.entity = selectionCharacterCommand.getEntity();
         return this;
     }
 
@@ -77,9 +85,13 @@ public class SelectEntityType {
     }
 
     private void displayEntityTypes() {
-        System.out.println("Select character class:");
+        System.out.println("Select character class and player name (add space between):");
         System.out.println("1. Archer (can dodge attack)");
         System.out.println("2. Warrior (can block attack)");
         System.out.println("3. Wizard (has stronger critical attack)");
+    }
+
+    private boolean isEntity() {
+        return this.entity != null;
     }
 }

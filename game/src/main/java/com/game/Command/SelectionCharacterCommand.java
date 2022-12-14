@@ -13,8 +13,10 @@ public class SelectionCharacterCommand implements ICommand{
 
     @Override
     public void execute() {
-        if (currentCharacter.equals(newCharacter))
-            return;
         currentCharacter = newCharacter;
+    }
+
+    public Entity getEntity() {
+        return this.currentCharacter;
     }
 }
