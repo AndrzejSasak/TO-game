@@ -3,7 +3,7 @@ package com.game;
 import java.util.*;
 
 public class Names {
-    private final String[] names = {
+    private final List<String> allNames = List.of(
             "Ryu Hayabusa",
             "Dirk The Daring",
             "Donkey Kong",
@@ -48,28 +48,23 @@ public class Names {
             "Christie Monteiro",
             "Black Knight",
             "Agent"
-    };
+    );
+
+    private List<String> unusedNames;
     private final Random rand;
-    private List<Integer> used;
+
     public Names(){
         rand = new Random();
-        used = new ArrayList<>();
+        unusedNames = new ArrayList<>(allNames);
     }
 
-    public String random(){
-        if (used.size() == names.length)
-            reset();
-
-        while (true){
-            Integer i = rand.nextInt(names.length);
-            if (used.stream().anyMatch(index -> (index.equals(i))))
-                continue;
-            used.add(i);
-            return names[i];
+    public String getRandomName() {
+        if(unusedNames.isEmpty()) {
+            unusedNames = new ArrayList<>(allNames);
         }
+
+        int i = rand.nextInt(unusedNames.size());
+        return unusedNames.get(i);
     }
 
-    private void reset(){
-        used = new ArrayList<>();
-    }
 }

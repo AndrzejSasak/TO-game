@@ -2,33 +2,44 @@ package com.game.battle;
 
 import com.game.entities.Entity;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class BattleIterator {
-    private List<Entity> teamOne;
-    private List<Entity> teamTwo;
-    private List<Entity> all;
-    private int i;
 
-    public BattleIterator(List<Entity> teamOne, List<Entity> teamTwo){
-        this.teamOne = teamOne;
-        this.teamTwo = teamTwo;
-        all = new ArrayList<>(teamOne);
-        all.addAll(teamTwo);
-        i = 0;
+    private final Battle battle;
+    private int index;
+
+    public BattleIterator(Battle battle){
+        this.battle = battle;
+        index = 0;
     }
+
     public boolean hasNext(){
-        return !teamOne.stream().allMatch(Entity::isDead) && !teamTwo.stream().allMatch(Entity::isDead);
+        return !battle.getTeamOne().stream().allMatch(Entity::isDead)
+                && !battle.getTeamTwo().stream().allMatch(Entity::isDead);
     }
-    public Entity getNext(){
-        if (!hasNext())
+
+    public Entity getNext() {
+        if (!hasNext()) {
             return null;
-        while(true){
-            Entity entity = all.get(i);
-            i += 1;
-            i %= all.size();
-            if (!entity.isDead()){
+        }
+
+        List<Entity> allEntitiesInBattle
+                = Stream.concat(battle.getTeamOne().stream(), battle.getTeamTwo().stream()).toList();
+
+        return getAliveEntity(allEntitiesInBattle);
+    }
+
+
+
+    private Entity getAliveEntity(List<Entity> allEntitiesInBattle) {
+        while(true) {
+            Entity entity = allEntitiesInBattle.get(index);
+            index += 1;
+            index %= allEntitiesInBattle.size();
+            if (!entity.isDead()) {
                 return entity;
             }
         }
