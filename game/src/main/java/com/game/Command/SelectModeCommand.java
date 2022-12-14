@@ -3,11 +3,13 @@ package com.game.Command;
 import com.game.entities.Entity;
 import com.game.gamemode.GameMode;
 import com.game.levels.Training;
+import com.game.menu.IMenu;
+import com.game.menu.MultiplayerMenuCreator;
 
 public class SelectModeCommand implements ICommand {
 
-    private GameMode gameMode;
-    private Entity player;
+    private final GameMode gameMode;
+    private final Entity player;
 
     public SelectModeCommand(GameMode gameMode, Entity player) {
         this.gameMode = gameMode;
@@ -22,7 +24,8 @@ public class SelectModeCommand implements ICommand {
                 training.run();
                 break;
             case MULTIPLAYER:
-                //TODO: run multi player
+                IMenu multiplayerMenu = new MultiplayerMenuCreator().createMenu(player);
+                multiplayerMenu.run();
                 break;
         }
     }
