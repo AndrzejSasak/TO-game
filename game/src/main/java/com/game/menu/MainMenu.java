@@ -1,4 +1,4 @@
-package com.game.sharedUserInterface;
+package com.game.menu;
 
 import com.game.Command.CommandExecutor;
 import com.game.Command.ShowLeaderboardCommand;
@@ -6,19 +6,19 @@ import com.game.Command.SelectModeCommand;
 import com.game.controllers.PlayerEntityController;
 import com.game.entities.Entity;
 import com.game.gamemode.GameMode;
+import com.game.sharedUserInterface.LocalMessages;
+import com.game.sharedUserInterface.SelectEntityType;
 
 import java.util.Scanner;
 
-public class Menu {
-    boolean isRunning = true;
-    private static final CommandExecutor commandExecutor = new CommandExecutor();
-    private Entity player;
-
-    public Menu(Entity player) {
+public class MainMenu extends IMenu{
+    public MainMenu(Entity player) {
+        super();
         this.player = player;
     }
 
-    public void printMenu() {
+    @Override
+    protected void printMenu() {
         LocalMessages.displayVerticalLine();
         System.out.println("1. Singleplayer");
         System.out.println("2. Multiplayer");
@@ -27,13 +27,7 @@ public class Menu {
         System.out.println("5. Exit");
     }
 
-    public void printMultiplayerMenu() {
-        LocalMessages.displayVerticalLine();
-        System.out.println("1. Join game");
-        System.out.println("2. Host game");
-        System.out.println("3. Back to main menu");
-    }
-
+    @Override
     public void run() {
         Scanner inputReader = new Scanner(System.in);
         String command;

@@ -1,6 +1,6 @@
 package com.game.Command;
 
-import com.game.Command.menuCommand.IMenuCommand;
+import com.game.Command.multiplayerMenuCommand.IMenuCommand;
 
 public class MultiplayerMenuCommand implements ICommand {
 
