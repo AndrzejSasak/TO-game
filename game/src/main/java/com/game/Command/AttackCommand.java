@@ -13,6 +13,6 @@ public class AttackCommand implements ICommand {
 
     @Override
     public void execute() {
-        opponent.getHit(attackRate);
+        
     }
 }

@@ -11,6 +11,6 @@ public class WaitCommand implements ICommand {
 
     @Override
     public void execute() {
-        entity
+
     }
 }
