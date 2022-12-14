@@ -2,12 +2,12 @@ package com.game;
 
 import com.game.entities.Entity;
 import com.game.sharedUserInterface.Login;
-import com.game.sharedUserInterface.Menu;
+import com.game.menu.MainMenu;
 
 public class Main {
    public static void main(String[] args) {
       Entity entity = new Login().createPlayer();
-      Menu menu = new Menu(entity);
+      MainMenu menu = new MainMenu(entity);
       menu.run();
    }
 }

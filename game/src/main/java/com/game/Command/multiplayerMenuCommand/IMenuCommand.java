@@ -1,4 +1,4 @@
-package com.game.Command.menuCommand;
+package com.game.Command.multiplayerMenuCommand;
 
 import com.game.Command.ICommand;
 
