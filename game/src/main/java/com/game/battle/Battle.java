@@ -11,6 +11,8 @@ public class Battle {
     private final List<Entity> teamTwo;
     private BattleIterator battleIterator;
 
+
+
     public List<Entity> getTeamOne() {
         return teamOne;
     }
@@ -21,6 +23,7 @@ public class Battle {
 
     public List<Entity> play() {
 
+        battleIterator = new BattleIterator(this);
         List<Entity> teamOne = this.getTeamOne();
         List<Entity> teamTwo = this.getTeamTwo();
 
