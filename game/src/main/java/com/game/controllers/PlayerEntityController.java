@@ -29,6 +29,7 @@ public class PlayerEntityController implements AbstractEntityController {
 
         CommandExecutor commandExecutor = new CommandExecutor();
         TargetSelectionCommand targetSelectionCommand = new TargetSelectionCommand(chosenEnemy, allEnemies);
+        commandExecutor.executeCommand(targetSelectionCommand);
 
         return targetSelectionCommand.getSelectedTarget();
     }
