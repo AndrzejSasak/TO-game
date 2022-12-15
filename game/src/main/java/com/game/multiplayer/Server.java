@@ -18,10 +18,9 @@ public class Server{
     final private static int playerNum = 1;
     private static int roundNumber = 0;
     private static NetRole netRole = NetRole.SERVER;
-
-    Entity playerOne = new Archer("Adrian", new PlayerEntityController());
-    Entity playerTwo = new Archer("Konrad", new PlayerEntityController());
-
+    private Entity playerOne;//host
+    private Entity playerTwo;//client
+    private IOManager ioManager;
     private static int player1Score = 0;
     private static int player2Score = 0;
 
@@ -45,8 +44,9 @@ public class Server{
          serverSocket = new ServerSocket(5000);
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        new Server().gameLoop();
+    public void Setup(Entity player) throws IOException, InterruptedException {
+        this.playerOne = player;
+        gameLoop();
     }
 
     private void gameLoop() throws IOException, InterruptedException {
@@ -60,10 +60,7 @@ public class Server{
         serverState = ServerState.STARTING_GAME;
 
         dotPrintService.stopTimer();
-        System.out.println("client connected");
-        TimeUnit.SECONDS.sleep(3);
-
-        IOManager ioManager = new IOManager(clientSocket);
+        ioManager = new IOManager(clientSocket);
         beginGame();
         serverState = ServerState.GAME_IN_PROGRESS;
 
@@ -81,6 +78,13 @@ public class Server{
     }
 
     private void beginGame() {
+        try {
+            playerTwo = (Entity)ioManager.receiveObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         Random random = new Random();
         roleStartedLastRound = random.nextBoolean() ? NetRole.SERVER : NetRole.CLIENT;
         roundNumber++;

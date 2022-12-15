@@ -3,11 +3,12 @@ package com.game.entities;
 import com.game.Messages;
 import com.game.controllers.AbstractEntityController;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-public abstract class Entity {
+public abstract class Entity implements Serializable {
 
     protected int maxHp;
     protected int attackPoints;

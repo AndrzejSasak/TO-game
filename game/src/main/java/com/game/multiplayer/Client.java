@@ -1,5 +1,7 @@
 package com.game.multiplayer;
 
+import com.game.entities.Entity;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -14,19 +16,19 @@ import java.util.stream.Stream;
 public class Client{
     Socket clientSocket;
     IOManager ioManager;
+    Entity player;
+    GameStatus gameStatus= GameStatus.NONE;
 
-    public Client(Socket clientSocket, IOManager ioManager) throws IOException {
+    public Client(Socket clientSocket, IOManager ioManager, Entity player) throws IOException {
         this.clientSocket = clientSocket;
         this.ioManager = ioManager;
+        this.player = player;
 
         clientJoinGame();
     }
 
-    public static void main(String[] args) throws IOException {
-        Socket clientSocket = new Socket("localhost", 5000);
-        IOManager ioManager = new IOManager(clientSocket);
-        Client newClient = new Client(clientSocket, ioManager);
-
+    public void clientJoinGame() throws IOException {
+        ioManager.sendObject(player);
     }
 
     public void LookForServers() throws UnknownHostException {
@@ -83,10 +85,5 @@ public class Client{
         return false;
     }
 
-    public void clientJoinGame() throws IOException {
-        ioManager.sendMessage("connected");
-        String testStr = ioManager.readMessage();
 
-        System.out.println("Server message "+ testStr);
-    }
 }
