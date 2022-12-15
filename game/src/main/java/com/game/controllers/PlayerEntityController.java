@@ -1,5 +1,7 @@
 package com.game.controllers;
 
+import com.game.Command.CommandExecutor;
+import com.game.Command.TargetSelectionCommand;
 import com.game.entities.Entity;
 import com.game.sharedUserInterface.LocalMessages;
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -16,7 +18,6 @@ public class PlayerEntityController implements AbstractEntityController {
     @Override
     public Optional<Entity> getNextTarget(Entity entity, List<Entity> allFriends, List<Entity> allEnemies) {
 
-        //TODO command
         LocalMessages.displayVerticalLine();
         System.out.println("Your turn!\nYour team:");
         allFriends.forEach(friend -> System.out.println(friend.getNameInfo()));
@@ -25,11 +26,11 @@ public class PlayerEntityController implements AbstractEntityController {
 
         Scanner myInput = new Scanner(System.in);
         int chosenEnemy = myInput.nextInt();
-        if(chosenEnemy >= allEnemies.size() || chosenEnemy < 0) {
-            return Optional.empty();
-        }
 
-        return Optional.of(allEnemies.get(chosenEnemy));
+        CommandExecutor commandExecutor = new CommandExecutor();
+        TargetSelectionCommand targetSelectionCommand = new TargetSelectionCommand(chosenEnemy, allEnemies);
+
+        return targetSelectionCommand.getSelectedTarget();
     }
 
     private void printPossibleOptions(List<Entity> allEnemies) {
