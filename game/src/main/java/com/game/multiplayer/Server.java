@@ -5,6 +5,7 @@ import com.game.entities.Archer;
 import com.game.entities.Entity;
 
 import java.util.Random;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -127,11 +128,11 @@ public class Server{
     }
 
     private void proceedServerMove(){
-        playerTwo.getHit(playerOne.getAttackPoints(),playerOne, null, null);
+
     }
 
     private void proceedClientMove(){
-        playerOne.getHit(playerTwo.getAttackPoints(),playerTwo, null, null);
+
     }
 
     private void endGame() {

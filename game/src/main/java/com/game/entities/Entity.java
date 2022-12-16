@@ -21,6 +21,10 @@ public abstract class Entity implements Serializable {
     protected String professionName;
     protected AbstractEntityController controller;
 
+    //Multiplayer actions control
+    public boolean bWantsToAttack = false;
+    public boolean bWantsToWait = false;
+
     protected Entity(String name, AbstractEntityController controller) {
         this.controller = controller;
         this.name = name;
@@ -137,6 +141,8 @@ public abstract class Entity implements Serializable {
     public boolean haveCritical(){
         return hasBoost;
     }
+
+    public void setCritical(boolean shouldHaveBoost) {this.hasBoost = shouldHaveBoost; }
 
     public int getMaxHp() {return maxHp;}
 
