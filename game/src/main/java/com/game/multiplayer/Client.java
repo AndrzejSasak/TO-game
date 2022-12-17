@@ -29,6 +29,15 @@ public class Client{
 
     public void clientJoinGame() throws IOException {
         ioManager.sendObject(player);
+        String fromServer;
+        fromServer = ioManager.readMessage();
+        while(fromServer != null){
+            System.out.println("loop");
+            System.out.println(fromServer);
+            ioManager.sendMessage("client wysyla!");
+            fromServer = ioManager.readMessage();
+        }
+
     }
 
     public void LookForServers() throws UnknownHostException {

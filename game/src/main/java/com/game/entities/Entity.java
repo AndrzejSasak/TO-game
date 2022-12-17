@@ -152,6 +152,8 @@ public abstract class Entity implements Serializable {
 
     public AbstractEntityController getController() { return controller;}
 
+    public void setController(AbstractEntityController newController) {this.controller = null; this.controller = newController;}
+
     public String getNameInfo() {
         if (isDead())
             return getProfessionName() + " " + name + " [" + level + "]" + " (Dead)";

@@ -128,10 +128,23 @@ public class Server{
     }
 
     private void proceedServerMove(){
+        System.out.println("proceedServerMove start");
+        ioManager.sendMessage("test");
+        System.out.println("proceedServerMove end");
 
     }
 
     private void proceedClientMove(){
+        String line;
+        try{
+            System.out.println("proceedClientMove start ");
+            line = ioManager.readMessage();
+            System.out.println("echo: " + line);
+            System.out.println("proceedClientMove end");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
 
