@@ -19,7 +19,9 @@ public class Client{
     IOManager ioManager;
     Entity player;
     GameStatus gameStatus= GameStatus.NONE;
-
+    int myScore = 0;
+    int otherPlayerScore = 0;
+    int roundNumber = 0;
     public Client(Socket clientSocket, IOManager ioManager, Entity player) throws IOException {
         this.clientSocket = clientSocket;
         this.ioManager = ioManager;
@@ -32,8 +34,22 @@ public class Client{
         ioManager.sendObject(player);
         String fromServer;
         fromServer = ioManager.readMessage();
+        boolean serverStartRound = fromServer.equals(MultiplayerAction.SERVER);
         System.out.println("client join game " + fromServer);
-        ProcessRound(fromServer.equalsIgnoreCase("Server"));
+        while(true){
+            ProcessRound(serverStartRound);
+            fromServer = ioManager.readMessage();
+            if(fromServer.equals(MultiplayerAction.END_OF_GAME)){
+                break;
+            }
+            serverStartRound = !serverStartRound;
+        }
+        if(myScore > otherPlayerScore){
+            System.out.println(MultiplayerAction.WON_GAME);
+        }
+        else{
+            System.out.println(MultiplayerAction.LOST_GAME);
+        }
     }
 
     private void ProcessRound(boolean bServerStart) throws IOException{
@@ -43,34 +59,49 @@ public class Client{
         else{
             ProcessRoundClientStart();
         }
+        String winner = ioManager.readMessage();
+        if(winner.equals(MultiplayerAction.CLIENT)){
+            myScore++;
+            System.out.println(MultiplayerAction.WON_ROUND);
+        }
+        else {
+            otherPlayerScore++;
+            System.out.println(MultiplayerAction.LOST_ROUND);
+        }
+        System.out.println("After round " + roundNumber + "Score: "+ "me"+ " " + myScore+" - "+ otherPlayerScore + " " + "opponent");
     }
 
     private void ProcessRoundServerStart() throws IOException{
-        System.out.println("ProcessRoundServerStart ");
         RemotePlayerEntityController playerEntityController = (RemotePlayerEntityController) player.getController();
         String fromServer;
         fromServer = ioManager.readMessage();
         while(fromServer != null){
-            System.out.println("loop");
             System.out.println(fromServer);
+            if(fromServer.equals(MultiplayerAction.END_OF_ROUND))
+            {
+                return;
+            }
             playerEntityController.performMultiplayerAction(player);
-            ioManager.sendMessage(player.bWantsToAttack ? "attack" : "wait");
+            ioManager.sendMessage(player.bWantsToAttack ? MultiplayerAction.ATTACK : MultiplayerAction.WAIT);
             fromServer = ioManager.readMessage();
         }
     }
 
     private void ProcessRoundClientStart() throws IOException{
         System.out.println("ProcessRoundClientStart ");
-        RemotePlayerEntityController playerEntityController = (RemotePlayerEntityController) player.getController();
-        playerEntityController.performMultiplayerAction(player);
-        ioManager.sendMessage("client wysyla!");
         String fromServer;
         fromServer = ioManager.readMessage();
+        RemotePlayerEntityController playerEntityController = (RemotePlayerEntityController) player.getController();
+        playerEntityController.performMultiplayerAction(player);
+        ioManager.sendMessage(player.bWantsToAttack ? MultiplayerAction.ATTACK : MultiplayerAction.WAIT);
+        fromServer = ioManager.readMessage();
         while(fromServer != null){
-            System.out.println("loop");
-            System.out.println(fromServer);
+            if(fromServer.equals(MultiplayerAction.END_OF_ROUND))
+            {
+                return;
+            }
             playerEntityController.performMultiplayerAction(player);
-            ioManager.sendMessage(player.bWantsToAttack ? "attack" : "wait");
+            ioManager.sendMessage(player.bWantsToAttack ? MultiplayerAction.ATTACK : MultiplayerAction.WAIT);
             fromServer = ioManager.readMessage();
         }
     }

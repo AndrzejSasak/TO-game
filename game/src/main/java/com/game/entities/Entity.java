@@ -130,6 +130,8 @@ public abstract class Entity implements Serializable {
         init(level); isAlive = true;
     }
 
+    public void setAttackPoints(int value) { this.attackPoints = value;}
+
     public int getAttackPoints() {
         return attackPoints;
     }
