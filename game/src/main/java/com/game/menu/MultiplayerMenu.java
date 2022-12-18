@@ -19,7 +19,8 @@ public class MultiplayerMenu extends IMenu{
     public MultiplayerMenu(Entity player) {
         super();
         this.player = player;
-        this.player.setController(new RemotePlayerEntityController());
+        PlayerEntityController playerEntityController = (PlayerEntityController) player.getController();
+        this.player.setController(new RemotePlayerEntityController(playerEntityController.getEntityOwner()));
     }
 
     @Override

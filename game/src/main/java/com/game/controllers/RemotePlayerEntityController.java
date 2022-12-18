@@ -5,6 +5,7 @@ import com.game.Command.CommandExecutor;
 import com.game.Command.TargetSelectionCommand;
 import com.game.Command.WaitCommand;
 import com.game.entities.Entity;
+import com.game.entities.User;
 import com.game.sharedUserInterface.LocalMessages;
 
 import java.util.List;
@@ -12,6 +13,16 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class RemotePlayerEntityController implements AbstractEntityController{
+
+    private User entityOwner;
+
+    public RemotePlayerEntityController(User entityOwner) {
+        this.entityOwner = entityOwner;
+    }
+
+    public User getEntityOwner() {
+        return entityOwner;
+    }
 
     @Override
     public Optional<Entity> getNextTarget(Entity entity, List<Entity> allFriends, List<Entity> allEnemies) {

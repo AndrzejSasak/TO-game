@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class Login {
     Entity entity;
     User user = new User();
-    PlayerEntityController playerEntityController = new PlayerEntityController();
+    PlayerEntityController playerEntityController = new PlayerEntityController(user);
 
     public Entity createPlayer() {
         Scanner inputReader = new Scanner(System.in);

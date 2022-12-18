@@ -98,15 +98,11 @@ public class Server{
         String toSend = roleStartedLastRound == NetRole.SERVER ? MultiplayerAction.SERVER : MultiplayerAction.CLIENT;
         ioManager.sendMessage(toSend);
         roundNumber++;
-        playerTwo.setAttackPoints(200);
-        playerOne.setAttackPoints(200);
     }
 
     private void onBeginRound() {
         roleStartedLastRound = roleStartedLastRound == NetRole.CLIENT ? NetRole.SERVER : NetRole.CLIENT;
         roundNumber++;
-        playerTwo.setAttackPoints(200);
-        playerOne.setAttackPoints(200);
     }
 
     private void progressRound() {
@@ -156,7 +152,7 @@ public class Server{
         remotePlayerEntityController.performMultiplayerAction(playerOne);
         if(playerOne.bWantsToAttack){
             playerOne.multiplayerAttack(playerTwo);
-            playerTwo.setCritical(false);
+            playerOne.setCritical(false);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.game.multiplayer;
 
+import com.game.controllers.PlayerEntityController;
 import com.game.controllers.RemotePlayerEntityController;
 import com.game.entities.Entity;
 
@@ -72,7 +73,7 @@ public class Client{
     }
 
     private void ProcessRoundServerStart() throws IOException{
-        RemotePlayerEntityController playerEntityController = (RemotePlayerEntityController) player.getController();
+        RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) player.getController();
         String fromServer;
         fromServer = ioManager.readMessage();
         while(fromServer != null){
@@ -81,8 +82,7 @@ public class Client{
             {
                 return;
             }
-            playerEntityController.performMultiplayerAction(player);
-            ioManager.sendMessage(player.bWantsToAttack ? MultiplayerAction.ATTACK : MultiplayerAction.WAIT);
+            PerformAction(remotePlayerEntityController, player);
             fromServer = ioManager.readMessage();
         }
     }
@@ -91,19 +91,23 @@ public class Client{
         System.out.println("ProcessRoundClientStart ");
         String fromServer;
         fromServer = ioManager.readMessage();
-        RemotePlayerEntityController playerEntityController = (RemotePlayerEntityController) player.getController();
-        playerEntityController.performMultiplayerAction(player);
-        ioManager.sendMessage(player.bWantsToAttack ? MultiplayerAction.ATTACK : MultiplayerAction.WAIT);
+        RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) player.getController();
+        PerformAction(remotePlayerEntityController, player);
         fromServer = ioManager.readMessage();
         while(fromServer != null){
             if(fromServer.equals(MultiplayerAction.END_OF_ROUND))
             {
                 return;
             }
-            playerEntityController.performMultiplayerAction(player);
-            ioManager.sendMessage(player.bWantsToAttack ? MultiplayerAction.ATTACK : MultiplayerAction.WAIT);
+            PerformAction(remotePlayerEntityController, player);
             fromServer = ioManager.readMessage();
         }
+    }
+
+    private void PerformAction(RemotePlayerEntityController remotePlayerEntityController, Entity player){
+        remotePlayerEntityController.performMultiplayerAction(player);
+        ioManager.sendMessage(player.bWantsToAttack ? MultiplayerAction.ATTACK : MultiplayerAction.WAIT);
+        player.setCritical(!player.bWantsToAttack);
     }
 
     public void LookForServers() throws UnknownHostException {

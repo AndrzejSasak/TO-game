@@ -3,6 +3,7 @@ package com.game.controllers;
 import com.game.Command.CommandExecutor;
 import com.game.Command.TargetSelectionCommand;
 import com.game.entities.Entity;
+import com.game.entities.User;
 import com.game.sharedUserInterface.LocalMessages;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -14,6 +15,16 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class PlayerEntityController implements AbstractEntityController {
+
+    private User entityOwner;
+
+    public PlayerEntityController(User entityOwner) {
+        this.entityOwner = entityOwner;
+    }
+
+    public User getEntityOwner() {
+        return entityOwner;
+    }
 
     @Override
     public Optional<Entity> getNextTarget(Entity entity, List<Entity> allFriends, List<Entity> allEnemies) {
