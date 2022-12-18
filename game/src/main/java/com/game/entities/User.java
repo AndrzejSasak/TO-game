@@ -5,8 +5,10 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 
+import java.io.Serializable;
+
 @XmlAccessorType(XmlAccessType.FIELD)
-public class User {
+public class User implements Serializable {
 
     @XmlElement(name="login")
     private String login;

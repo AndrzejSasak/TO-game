@@ -148,7 +148,6 @@ public class Server{
     }
 
     private void proceedServerMove(RemotePlayerEntityController remotePlayerEntityController){
-        System.out.println("proceedServerMove");
         remotePlayerEntityController.performMultiplayerAction(playerOne);
         if(playerOne.bWantsToAttack){
             playerOne.multiplayerAttack(playerTwo);
@@ -157,7 +156,7 @@ public class Server{
     }
 
     private void proceedClientMove(){
-        System.out.println("proceedClientMove");
+        System.out.println("Waiting for "+ playerTwo.getName() + "move");
         ioManager.sendMessage(MultiplayerAction.CLIENT_TURN);
         String line;
         try{
@@ -166,6 +165,7 @@ public class Server{
                 playerTwo.bWantsToAttack = false;
                 playerTwo.bWantsToWait = true;
                 playerTwo.setCritical(true);
+                System.out.println(playerTwo.getName() + " is generating boosted attack!");
             }
             else if(line.equalsIgnoreCase(MultiplayerAction.ATTACK)){
                 playerTwo.bWantsToWait = false;
