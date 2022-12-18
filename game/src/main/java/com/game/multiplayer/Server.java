@@ -1,6 +1,7 @@
 package com.game.multiplayer;
 
 import com.game.controllers.PlayerEntityController;
+import com.game.controllers.RemotePlayerEntityController;
 import com.game.entities.Archer;
 import com.game.entities.Entity;
 
@@ -64,6 +65,8 @@ public class Server{
         ioManager = new IOManager(clientSocket);
         beginGame();
         serverState = ServerState.GAME_IN_PROGRESS;
+        progressRound();
+        onEndRound();
 
         while(player1Score != 3 && player2Score != 3)
         {
@@ -88,6 +91,9 @@ public class Server{
         }
         Random random = new Random();
         roleStartedLastRound = random.nextBoolean() ? NetRole.SERVER : NetRole.CLIENT;
+        String toSend = roleStartedLastRound == NetRole.SERVER ? "Server" : "Client";
+        ioManager.sendMessage(toSend);
+        System.out.println("server begin game " + toSend);
         roundNumber++;
     }
 
@@ -98,15 +104,15 @@ public class Server{
 
     private void progressRound() {
         boolean bAnyPlayerDead = false;
-
+        RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) playerOne.getController();
         while (!bAnyPlayerDead){
             if(roleStartedLastRound == NetRole.SERVER) {
-                proceedServerMove();
+                proceedServerMove(remotePlayerEntityController);
                 proceedClientMove();
             }
             else {
                 proceedClientMove();
-                proceedServerMove();
+                proceedServerMove(remotePlayerEntityController);
             }
             bAnyPlayerDead = playerOne.isDead() || playerTwo.isDead();
         }
@@ -127,11 +133,15 @@ public class Server{
         playerTwo.revive();
     }
 
-    private void proceedServerMove(){
+    private void proceedServerMove(RemotePlayerEntityController remotePlayerEntityController){
         System.out.println("proceedServerMove start");
-        ioManager.sendMessage("test");
+        remotePlayerEntityController.performMultiplayerAction(playerOne);
+        if(playerOne.bWantsToAttack){
+            playerOne.multiplayerAttack(playerTwo);
+            playerTwo.setCritical(false);
+        }
         System.out.println("proceedServerMove end");
-
+        ioManager.sendMessage("test");
     }
 
     private void proceedClientMove(){
@@ -139,7 +149,19 @@ public class Server{
         try{
             System.out.println("proceedClientMove start ");
             line = ioManager.readMessage();
-            System.out.println("echo: " + line);
+            if(line.equalsIgnoreCase( "wait")){
+                playerTwo.bWantsToAttack = false;
+                playerTwo.bWantsToWait = true;
+                playerTwo.setCritical(true);
+            }
+            else if(line.equalsIgnoreCase("attack")){
+                playerTwo.bWantsToWait = false;
+                playerTwo.bWantsToAttack = true;
+            }
+            if(playerTwo.bWantsToAttack){
+                playerTwo.multiplayerAttack(playerOne);
+                playerTwo.setCritical(false);
+            }
             System.out.println("proceedClientMove end");
         }
         catch (Exception e){

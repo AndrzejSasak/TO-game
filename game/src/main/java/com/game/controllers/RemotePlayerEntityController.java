@@ -24,7 +24,7 @@ public class RemotePlayerEntityController implements AbstractEntityController{
         Scanner in = new Scanner(System.in);
         int chosenOption = in.nextInt();
 
-        while ((parent.haveCritical() && chosenOption != 1) || (chosenOption != 1 || chosenOption != 0)) {
+        while ((parent.haveCritical() && chosenOption != 1) && (chosenOption != 1 || chosenOption != 0)) {
             displayMessages(parent, false);
             chosenOption = in.nextInt();
         }

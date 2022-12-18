@@ -48,6 +48,10 @@ public abstract class Entity implements Serializable {
 
     }
 
+    public void multiplayerAttack(Entity target){
+        attack(target, null, null);
+    }
+
     protected void attack(Entity target, List<Entity> allFriends, List<Entity> allEnemies) {
         int attack = criticalAttack(this.attackPoints);
         attack = boostedAttack(attack, target);

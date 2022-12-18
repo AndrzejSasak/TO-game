@@ -1,5 +1,6 @@
 package com.game.multiplayer;
 
+import com.game.controllers.RemotePlayerEntityController;
 import com.game.entities.Entity;
 
 import java.io.IOException;
@@ -31,13 +32,47 @@ public class Client{
         ioManager.sendObject(player);
         String fromServer;
         fromServer = ioManager.readMessage();
+        System.out.println("client join game " + fromServer);
+        ProcessRound(fromServer.equalsIgnoreCase("Server"));
+    }
+
+    private void ProcessRound(boolean bServerStart) throws IOException{
+        if(bServerStart) {
+            ProcessRoundServerStart();
+        }
+        else{
+            ProcessRoundClientStart();
+        }
+    }
+
+    private void ProcessRoundServerStart() throws IOException{
+        System.out.println("ProcessRoundServerStart ");
+        RemotePlayerEntityController playerEntityController = (RemotePlayerEntityController) player.getController();
+        String fromServer;
+        fromServer = ioManager.readMessage();
         while(fromServer != null){
             System.out.println("loop");
             System.out.println(fromServer);
-            ioManager.sendMessage("client wysyla!");
+            playerEntityController.performMultiplayerAction(player);
+            ioManager.sendMessage(player.bWantsToAttack ? "attack" : "wait");
             fromServer = ioManager.readMessage();
         }
+    }
 
+    private void ProcessRoundClientStart() throws IOException{
+        System.out.println("ProcessRoundClientStart ");
+        RemotePlayerEntityController playerEntityController = (RemotePlayerEntityController) player.getController();
+        playerEntityController.performMultiplayerAction(player);
+        ioManager.sendMessage("client wysyla!");
+        String fromServer;
+        fromServer = ioManager.readMessage();
+        while(fromServer != null){
+            System.out.println("loop");
+            System.out.println(fromServer);
+            playerEntityController.performMultiplayerAction(player);
+            ioManager.sendMessage(player.bWantsToAttack ? "attack" : "wait");
+            fromServer = ioManager.readMessage();
+        }
     }
 
     public void LookForServers() throws UnknownHostException {
