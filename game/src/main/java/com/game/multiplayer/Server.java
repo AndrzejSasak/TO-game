@@ -1,10 +1,14 @@
 package com.game.multiplayer;
 
 import com.game.controllers.PlayerEntityController;
+import com.game.controllers.RemotePlayerEntityController;
 import com.game.entities.Archer;
 import com.game.entities.Entity;
+import com.game.sharedUserInterface.LocalMessages;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -18,13 +22,11 @@ public class Server{
     final private static int playerNum = 1;
     private static int roundNumber = 0;
     private static NetRole netRole = NetRole.SERVER;
-
-    Entity playerOne = new Archer("Adrian", new PlayerEntityController());
-    Entity playerTwo = new Archer("Konrad", new PlayerEntityController());
-
+    private Entity playerOne;//host
+    private Entity playerTwo;//client
+    private IOManager ioManager;
     private static int player1Score = 0;
     private static int player2Score = 0;
-
     private static NetRole roleStartedLastRound;
 
     private static volatile Server INSTANCE;
@@ -45,8 +47,9 @@ public class Server{
          serverSocket = new ServerSocket(5000);
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        new Server().gameLoop();
+    public void Setup(Entity player) throws IOException, InterruptedException {
+        this.playerOne = player;
+        gameLoop();
     }
 
     private void gameLoop() throws IOException, InterruptedException {
@@ -60,29 +63,40 @@ public class Server{
         serverState = ServerState.STARTING_GAME;
 
         dotPrintService.stopTimer();
-        System.out.println("client connected");
-        TimeUnit.SECONDS.sleep(3);
-
-        IOManager ioManager = new IOManager(clientSocket);
+        ioManager = new IOManager(clientSocket);
         beginGame();
         serverState = ServerState.GAME_IN_PROGRESS;
+        progressRound();
+        onEndRound();
 
         while(player1Score != 3 && player2Score != 3)
         {
+            LocalMessages.displayVerticalLine();
+            System.out.println("After round " + roundNumber + "Score: "+ playerOne.getName() + " " + player1Score+" - "+ player2Score + " " + playerTwo.getName());
+            LocalMessages.displayVerticalLine();
             onBeginRound();
             progressRound();
             onEndRound();
         }
-
+        ioManager.sendMessage(MultiplayerAction.END_OF_GAME);
         System.out.println("Game ended with result: "+player1Score+" "+player2Score);
-        System.out.println(player1Score>player2Score ? "Player One won game" : "Player two won the game");
+        System.out.println(player1Score>player2Score ? MultiplayerAction.WON_GAME : MultiplayerAction.LOST_GAME);
 
         serverState = ServerState.END_GAME;
     }
 
     private void beginGame() {
+        try {
+            playerTwo = (Entity)ioManager.receiveObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         Random random = new Random();
         roleStartedLastRound = random.nextBoolean() ? NetRole.SERVER : NetRole.CLIENT;
+        String toSend = roleStartedLastRound == NetRole.SERVER ? MultiplayerAction.SERVER : MultiplayerAction.CLIENT;
+        ioManager.sendMessage(toSend);
         roundNumber++;
     }
 
@@ -93,44 +107,97 @@ public class Server{
 
     private void progressRound() {
         boolean bAnyPlayerDead = false;
-
+        RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) playerOne.getController();
         while (!bAnyPlayerDead){
             if(roleStartedLastRound == NetRole.SERVER) {
-                proceedServerMove();
+                proceedServerMove(remotePlayerEntityController);
+                if(playerTwo.isDead()) {
+                    break;
+                }
                 proceedClientMove();
             }
             else {
                 proceedClientMove();
-                proceedServerMove();
+                if(playerOne.isDead()) {
+                    break;
+                }
+                proceedServerMove(remotePlayerEntityController);
             }
             bAnyPlayerDead = playerOne.isDead() || playerTwo.isDead();
-        }
-
-        if(bAnyPlayerDead) {
-            if(playerTwo.isDead()) {
-                player1Score++;
-            }
-            else{
-                player2Score++;
-            }
-            return;
         }
     }
 
     private void onEndRound(){
+        boolean bClientWinner = false;
+        if(playerTwo.isDead()) {
+            player1Score++;
+            System.out.println(MultiplayerAction.WON_ROUND);
+        }
+        else{
+            player2Score++;
+            bClientWinner = true;
+        }
+
         playerOne.revive();
         playerTwo.revive();
+        ioManager.sendMessage(MultiplayerAction.END_OF_ROUND);
+        ioManager.sendMessage(bClientWinner ? MultiplayerAction.CLIENT : MultiplayerAction.SERVER);
+        if(player1Score != 3 && player2Score != 3){
+            ioManager.sendMessage(MultiplayerAction.NEXT_ROUND);
+        }
     }
 
-    private void proceedServerMove(){
-        playerTwo.getHit(playerOne.getAttackPoints(),playerOne, null, null);
+    private void proceedServerMove(RemotePlayerEntityController remotePlayerEntityController){
+        remotePlayerEntityController.performMultiplayerAction(playerOne);
+        if(playerOne.bWantsToAttack){
+            int dmg = playerTwo.getHp();
+            playerOne.multiplayerAttack(playerTwo);
+            playerOne.setCritical(false);
+            dmg -= playerTwo.getHp();
+            ioManager.sendMessage(playerOne.getName() + " attacked you and dealt " + dmg + "dmg! " +
+                    playerTwo.getName() +" (" + playerTwo.getHp() + "/" + playerTwo.getMaxHp() + ") " + playerOne.getName() +" (" + playerOne.getHp() + "/" + playerOne.getMaxHp() + ")");
+        }
+        else{
+            ioManager.sendMessage(playerOne.getName() + " is generating boosted attack! " +
+                    playerTwo.getName() +" (" + playerTwo.getHp() + "/" + playerTwo.getMaxHp() + ") " + playerOne.getName() +" (" + playerOne.getHp() + "/" + playerOne.getMaxHp() + ")");
+        }
     }
 
     private void proceedClientMove(){
-        playerOne.getHit(playerTwo.getAttackPoints(),playerTwo, null, null);
+        System.out.println("Waiting for "+ playerTwo.getName() + "move");
+        ioManager.sendMessage(MultiplayerAction.CLIENT_TURN);
+        String line;
+        try{
+            line = ioManager.readMessage();
+            if(line.equalsIgnoreCase(MultiplayerAction.WAIT)){
+                playerTwo.bWantsToAttack = false;
+                playerTwo.bWantsToWait = true;
+                playerTwo.setCritical(true);
+                System.out.println(playerTwo.getName() + " is generating boosted attack!");
+                ioManager.sendMessage("You are generating boosted attack! " +
+                        playerTwo.getName() +" (" + playerTwo.getHp() + "/" + playerTwo.getMaxHp() + ") " + playerOne.getName() +" (" + playerOne.getHp() + "/" + playerOne.getMaxHp() + ")");
+            }
+            else if(line.equalsIgnoreCase(MultiplayerAction.ATTACK)){
+                playerTwo.bWantsToWait = false;
+                playerTwo.bWantsToAttack = true;
+            }
+            if(playerTwo.bWantsToAttack){
+                int dmg = playerOne.getHp();
+                playerTwo.multiplayerAttack(playerOne);
+                playerTwo.setCritical(false);
+                dmg -= playerOne.getHp();
+                ioManager.sendMessage("You have attacked "+ playerOne.getName() +" and dealt " + dmg + "dmg! " +
+                        playerTwo.getName() +" (" + playerTwo.getHp() + "/" + playerTwo.getMaxHp() + ") " + playerOne.getName() +" (" + playerOne.getHp() + "/" + playerOne.getMaxHp() + ")");
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     private void endGame() {
+        ioManager.sendMessage(MultiplayerAction.END_OF_GAME);
         //TODO:update leaderboard
     }
 }

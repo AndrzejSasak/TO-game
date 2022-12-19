@@ -3,12 +3,12 @@ package com.game.entities;
 import com.game.Messages;
 import com.game.controllers.AbstractEntityController;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-public abstract class Entity {
-
+public abstract class Entity implements Serializable {
     protected int maxHp;
     protected int attackPoints;
     protected int level;
@@ -19,6 +19,10 @@ public abstract class Entity {
     protected String name;
     protected String professionName;
     protected AbstractEntityController controller;
+
+    //Multiplayer actions control
+    public boolean bWantsToAttack = false;
+    public boolean bWantsToWait = false;
 
     protected Entity(String name, AbstractEntityController controller) {
         this.controller = controller;
@@ -41,6 +45,10 @@ public abstract class Entity {
             }
         }
 
+    }
+
+    public void multiplayerAttack(Entity target){
+        attack(target, null, null);
     }
 
     protected void attack(Entity target, List<Entity> allFriends, List<Entity> allEnemies) {
@@ -121,6 +129,8 @@ public abstract class Entity {
         init(level); isAlive = true;
     }
 
+    public void setAttackPoints(int value) { this.attackPoints = value;}
+
     public int getAttackPoints() {
         return attackPoints;
     }
@@ -137,6 +147,8 @@ public abstract class Entity {
         return hasBoost;
     }
 
+    public void setCritical(boolean shouldHaveBoost) {this.hasBoost = shouldHaveBoost; }
+
     public int getMaxHp() {return maxHp;}
 
     public String getName(){
@@ -144,6 +156,8 @@ public abstract class Entity {
     }
 
     public AbstractEntityController getController() { return controller;}
+
+    public void setController(AbstractEntityController newController) {this.controller = null; this.controller = newController;}
 
     public String getNameInfo() {
         if (isDead())

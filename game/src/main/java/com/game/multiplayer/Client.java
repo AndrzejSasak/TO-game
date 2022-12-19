@@ -1,5 +1,9 @@
 package com.game.multiplayer;
 
+import com.game.controllers.PlayerEntityController;
+import com.game.controllers.RemotePlayerEntityController;
+import com.game.entities.Entity;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -14,19 +18,99 @@ import java.util.stream.Stream;
 public class Client{
     Socket clientSocket;
     IOManager ioManager;
-
-    public Client(Socket clientSocket, IOManager ioManager) throws IOException {
+    Entity player;
+    GameStatus gameStatus= GameStatus.NONE;
+    int myScore = 0;
+    int otherPlayerScore = 0;
+    int roundNumber = 0;
+    public Client(Socket clientSocket, IOManager ioManager, Entity player) throws IOException {
         this.clientSocket = clientSocket;
         this.ioManager = ioManager;
+        this.player = player;
 
         clientJoinGame();
     }
 
-    public static void main(String[] args) throws IOException {
-        Socket clientSocket = new Socket("localhost", 5000);
-        IOManager ioManager = new IOManager(clientSocket);
-        Client newClient = new Client(clientSocket, ioManager);
+    public void clientJoinGame() throws IOException {
+        ioManager.sendObject(player);
+        String fromServer;
+        fromServer = ioManager.readMessage();
+        boolean serverStartRound = fromServer.equals(MultiplayerAction.SERVER);
+        while(true){
+            ProcessRound(serverStartRound);
+            fromServer = ioManager.readMessage();
+            if(fromServer.equals(MultiplayerAction.END_OF_GAME)){
+                break;
+            }
+            serverStartRound = !serverStartRound;
+        }
+        if(myScore > otherPlayerScore){
+            System.out.println(MultiplayerAction.WON_GAME);
+        }
+        else{
+            System.out.println(MultiplayerAction.LOST_GAME);
+        }
+    }
 
+    private void ProcessRound(boolean bServerStart) throws IOException{
+        if(bServerStart) {
+            ProcessRoundServerStart();
+        }
+        else{
+            ProcessRoundClientStart();
+        }
+        String winner = ioManager.readMessage();
+        if(winner.equals(MultiplayerAction.CLIENT)){
+            myScore++;
+            System.out.println(MultiplayerAction.WON_ROUND);
+        }
+        else {
+            otherPlayerScore++;
+            System.out.println(MultiplayerAction.LOST_ROUND);
+        }
+        System.out.println("After round " + roundNumber + "Score: "+ "me"+ " " + myScore+" - "+ otherPlayerScore + " " + "opponent");
+    }
+
+    private void ProcessRoundServerStart() throws IOException{
+        RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) player.getController();
+        String fromServer;
+        System.out.println(ioManager.readMessage());
+        fromServer = ioManager.readMessage();
+        while(fromServer != null){
+            if(fromServer.equals(MultiplayerAction.END_OF_ROUND))
+            {
+                return;
+            }
+            PerformAction(remotePlayerEntityController, player);
+            System.out.println(ioManager.readMessage());
+            System.out.println(ioManager.readMessage());
+            fromServer = ioManager.readMessage();
+        }
+    }
+
+    private void ProcessRoundClientStart() throws IOException{
+        String fromServer;
+        fromServer = ioManager.readMessage();
+        RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) player.getController();
+        PerformAction(remotePlayerEntityController, player);
+        System.out.println(ioManager.readMessage());
+        fromServer = ioManager.readMessage();
+        while(fromServer != null){
+            System.out.println(fromServer);
+            fromServer = ioManager.readMessage();
+            if(fromServer.equals(MultiplayerAction.END_OF_ROUND)) {
+                return;
+            }
+            PerformAction(remotePlayerEntityController, player);
+            System.out.println(ioManager.readMessage());
+            fromServer = ioManager.readMessage();
+        }
+    }
+
+    private void PerformAction(RemotePlayerEntityController remotePlayerEntityController, Entity player){
+        remotePlayerEntityController.performMultiplayerAction(player);
+        ioManager.sendMessage(player.bWantsToAttack ? MultiplayerAction.ATTACK : MultiplayerAction.WAIT);
+        player.setCritical(!player.bWantsToAttack);
     }
 
     public void LookForServers() throws UnknownHostException {
@@ -83,10 +167,5 @@ public class Client{
         return false;
     }
 
-    public void clientJoinGame() throws IOException {
-        ioManager.sendMessage("connected");
-        String testStr = ioManager.readMessage();
 
-        System.out.println("Server message "+ testStr);
-    }
 }

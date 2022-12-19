@@ -1,6 +1,9 @@
 package com.game.Command.multiplayerMenuCommand;
 
 import com.game.entities.Entity;
+import com.game.multiplayer.Server;
+
+import java.io.IOException;
 
 public class HostCommand implements IMenuCommand{
     Entity player;
@@ -11,6 +14,13 @@ public class HostCommand implements IMenuCommand{
 
     @Override
     public void execute() {
-        //TODO: run server
+        Server server = Server.getInstance();
+        try {
+            server.Setup(player);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
