@@ -36,7 +36,6 @@ public class Client{
         String fromServer;
         fromServer = ioManager.readMessage();
         boolean serverStartRound = fromServer.equals(MultiplayerAction.SERVER);
-        System.out.println("client join game " + fromServer);
         while(true){
             ProcessRound(serverStartRound);
             fromServer = ioManager.readMessage();
@@ -75,31 +74,35 @@ public class Client{
     private void ProcessRoundServerStart() throws IOException{
         RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) player.getController();
         String fromServer;
+        System.out.println(ioManager.readMessage());
         fromServer = ioManager.readMessage();
         while(fromServer != null){
-            System.out.println(fromServer);
             if(fromServer.equals(MultiplayerAction.END_OF_ROUND))
             {
                 return;
             }
             PerformAction(remotePlayerEntityController, player);
+            System.out.println(ioManager.readMessage());
+            System.out.println(ioManager.readMessage());
             fromServer = ioManager.readMessage();
         }
     }
 
     private void ProcessRoundClientStart() throws IOException{
-        System.out.println("ProcessRoundClientStart ");
         String fromServer;
         fromServer = ioManager.readMessage();
         RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) player.getController();
         PerformAction(remotePlayerEntityController, player);
+        System.out.println(ioManager.readMessage());
         fromServer = ioManager.readMessage();
         while(fromServer != null){
-            if(fromServer.equals(MultiplayerAction.END_OF_ROUND))
-            {
+            System.out.println(fromServer);
+            fromServer = ioManager.readMessage();
+            if(fromServer.equals(MultiplayerAction.END_OF_ROUND)) {
                 return;
             }
             PerformAction(remotePlayerEntityController, player);
+            System.out.println(ioManager.readMessage());
             fromServer = ioManager.readMessage();
         }
     }

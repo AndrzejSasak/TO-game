@@ -6,6 +6,7 @@ import com.game.entities.Archer;
 import com.game.entities.Entity;
 import com.game.sharedUserInterface.LocalMessages;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +27,6 @@ public class Server{
     private IOManager ioManager;
     private static int player1Score = 0;
     private static int player2Score = 0;
-
     private static NetRole roleStartedLastRound;
 
     private static volatile Server INSTANCE;
@@ -150,8 +150,16 @@ public class Server{
     private void proceedServerMove(RemotePlayerEntityController remotePlayerEntityController){
         remotePlayerEntityController.performMultiplayerAction(playerOne);
         if(playerOne.bWantsToAttack){
+            int dmg = playerTwo.getHp();
             playerOne.multiplayerAttack(playerTwo);
             playerOne.setCritical(false);
+            dmg -= playerTwo.getHp();
+            ioManager.sendMessage(playerOne.getName() + " attacked you and dealt " + dmg + "dmg! " +
+                    playerTwo.getName() +" (" + playerTwo.getHp() + "/" + playerTwo.getMaxHp() + ") " + playerOne.getName() +" (" + playerOne.getHp() + "/" + playerOne.getMaxHp() + ")");
+        }
+        else{
+            ioManager.sendMessage(playerOne.getName() + " is generating boosted attack! " +
+                    playerTwo.getName() +" (" + playerTwo.getHp() + "/" + playerTwo.getMaxHp() + ") " + playerOne.getName() +" (" + playerOne.getHp() + "/" + playerOne.getMaxHp() + ")");
         }
     }
 
@@ -166,14 +174,20 @@ public class Server{
                 playerTwo.bWantsToWait = true;
                 playerTwo.setCritical(true);
                 System.out.println(playerTwo.getName() + " is generating boosted attack!");
+                ioManager.sendMessage("You are generating boosted attack! " +
+                        playerTwo.getName() +" (" + playerTwo.getHp() + "/" + playerTwo.getMaxHp() + ") " + playerOne.getName() +" (" + playerOne.getHp() + "/" + playerOne.getMaxHp() + ")");
             }
             else if(line.equalsIgnoreCase(MultiplayerAction.ATTACK)){
                 playerTwo.bWantsToWait = false;
                 playerTwo.bWantsToAttack = true;
             }
             if(playerTwo.bWantsToAttack){
+                int dmg = playerOne.getHp();
                 playerTwo.multiplayerAttack(playerOne);
                 playerTwo.setCritical(false);
+                dmg -= playerOne.getHp();
+                ioManager.sendMessage("You have attacked "+ playerOne.getName() +" and dealt " + dmg + "dmg! " +
+                        playerTwo.getName() +" (" + playerTwo.getHp() + "/" + playerTwo.getMaxHp() + ") " + playerOne.getName() +" (" + playerOne.getHp() + "/" + playerOne.getMaxHp() + ")");
             }
         }
         catch (Exception e){
