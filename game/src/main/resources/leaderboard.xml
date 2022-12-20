@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Leaderboard>
-    <Players>
-        <Player>
+    <Users>
+        <User>
             <login>User1</login>
             <highScore>12345</highScore>
-        </Player>
-        <Player>
+        </User>
+        <User>
             <login>User2</login>
             <highScore>2345</highScore>
-        </Player>
-        <Player>
+        </User>
+        <User>
             <login>ExampleUser</login>
             <highScore>1234</highScore>
-        </Player>
-        <Player>
+        </User>
+        <User>
             <login>login</login>
             <highScore>789</highScore>
-        </Player>
-    </Players>
+        </User>
+    </Users>
 </Leaderboard>

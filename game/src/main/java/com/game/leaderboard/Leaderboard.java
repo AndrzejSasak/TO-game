@@ -1,18 +1,13 @@
 package com.game.leaderboard;
 
 import com.game.entities.User;
-import jakarta.xml.bind.annotation.*;
 
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
-@XmlRootElement(name="Leaderboard")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class Leaderboard {
 
-    @XmlElementWrapper(name="Users")
-    @XmlElement(name="User")
     private Set<User> users;
 
     public Leaderboard() {
