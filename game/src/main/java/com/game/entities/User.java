@@ -1,22 +1,18 @@
 package com.game.entities;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlTransient;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
+import java.util.Objects;
 
-@XmlAccessorType(XmlAccessType.FIELD)
 public class User implements Serializable {
 
-    @XmlElement(name="login")
+    @JsonProperty("login")
     private String login;
-
-    @XmlElement(name="highScore")
+    @JsonProperty("highscore")
     private long highScore;
-
-    @XmlTransient
+    @JsonIgnore
     private long currentScore;
 
     public String getLogin() {
@@ -46,5 +42,18 @@ public class User implements Serializable {
     @Override
     public String toString() {
         return login + " => Highest score: " + highScore;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return Objects.equals(login, user.login);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(login);
     }
 }
