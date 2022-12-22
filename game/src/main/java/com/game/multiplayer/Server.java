@@ -4,6 +4,7 @@ import com.game.controllers.PlayerEntityController;
 import com.game.controllers.RemotePlayerEntityController;
 import com.game.entities.Archer;
 import com.game.entities.Entity;
+import com.game.entities.User;
 import com.game.sharedUserInterface.LocalMessages;
 
 import java.io.ByteArrayOutputStream;
@@ -28,6 +29,7 @@ public class Server{
     private static int player1Score = 0;
     private static int player2Score = 0;
     private static NetRole roleStartedLastRound;
+    private static boolean winnerPlayerOne = false;
 
     private static volatile Server INSTANCE;
 
@@ -59,11 +61,37 @@ public class Server{
         DotPrintService dotPrintService = new DotPrintService();
         dotPrintService.startTimer();
         Socket clientSocket = serverSocket.accept();
+        try{
+            ioManager = new IOManager(clientSocket);
+        }
+        catch (Exception E){
 
+        }
+
+        String fromClient = "";
+        if(ioManager != null) {
+            fromClient = ioManager.readMessage();
+        }
+        while(fromClient != null){
+            if(fromClient.equalsIgnoreCase(MultiplayerAction.WANTTOCONNET)) {
+                break;
+            }
+            if(ioManager != null) {
+                ioManager.sendMessage("Close");
+            }
+            /*try {
+                serverSocket.close();
+            }
+            catch (Exception e) {
+                System.out.println("Already closed!");
+            }*/
+            clientSocket = serverSocket.accept();
+            ioManager = new IOManager(clientSocket);
+            fromClient = ioManager.readMessage();
+        }
         serverState = ServerState.STARTING_GAME;
 
         dotPrintService.stopTimer();
-        ioManager = new IOManager(clientSocket);
         beginGame();
         serverState = ServerState.GAME_IN_PROGRESS;
         progressRound();
@@ -81,7 +109,7 @@ public class Server{
         ioManager.sendMessage(MultiplayerAction.END_OF_GAME);
         System.out.println("Game ended with result: "+player1Score+" "+player2Score);
         System.out.println(player1Score>player2Score ? MultiplayerAction.WON_GAME : MultiplayerAction.LOST_GAME);
-
+        winnerPlayerOne = player1Score>player2Score;
         serverState = ServerState.END_GAME;
     }
 
@@ -164,7 +192,7 @@ public class Server{
     }
 
     private void proceedClientMove(){
-        System.out.println("Waiting for "+ playerTwo.getName() + "move");
+        System.out.println("Waiting for "+ playerTwo.getName() + " move");
         ioManager.sendMessage(MultiplayerAction.CLIENT_TURN);
         String line;
         try{
@@ -199,5 +227,15 @@ public class Server{
     private void endGame() {
         ioManager.sendMessage(MultiplayerAction.END_OF_GAME);
         //TODO:update leaderboard
+        if(winnerPlayerOne){
+            RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) playerOne.getController();
+            User user = remotePlayerEntityController.getEntityOwner();
+        }
+
+        try {
+            serverSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
