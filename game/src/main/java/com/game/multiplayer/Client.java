@@ -28,6 +28,8 @@ public class Client{
         this.ioManager = ioManager;
         this.player = player;
 
+
+
         clientJoinGame();
     }
 
@@ -113,17 +115,20 @@ public class Client{
         player.setCritical(!player.bWantsToAttack);
     }
 
-    public void LookForServers() throws UnknownHostException {
+    public static List<InetAddress> LookForServers() throws UnknownHostException {
         int port = 5000;
         List<InetAddress> ips = getAvailableIps();
-
+        List<InetAddress> possibleServers = new ArrayList<>();
         for(InetAddress valid : ips){
             Socket s = null;
             try {
                 s = new Socket(valid.toString().substring(1), port);
-                System.out.println(valid.toString().substring(1) + " is not available");
+                IOManager ioManager = new IOManager(s);
+                ioManager.sendMessage(MultiplayerAction.LOOKING);
+                ioManager.readMessage();
+                possibleServers.add(valid);
             } catch (IOException e) {
-                System.out.println(valid.toString().substring(1) + " is available");
+
             } finally {
                 if( s != null){
                     try {
@@ -133,8 +138,9 @@ public class Client{
                     }
                 }
             }
-            //System.out.println(valid.toString().substring(1));
         }
+
+        return possibleServers;
     }
 
     public static List<InetAddress> getAvailableIps() throws UnknownHostException {
