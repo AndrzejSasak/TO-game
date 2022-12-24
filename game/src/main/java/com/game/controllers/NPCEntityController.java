@@ -1,6 +1,7 @@
 package com.game.controllers;
 
 import com.game.entities.Entity;
+import com.game.entities.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +35,11 @@ public class NPCEntityController implements AbstractEntityController {
         }
         
         return Optional.of(finalTarget);
+    }
+
+    @Override
+    public Optional<User> getRealPlayerEntityOwner() {
+        return Optional.empty();
     }
 
     private boolean gotCriticalAttack() {

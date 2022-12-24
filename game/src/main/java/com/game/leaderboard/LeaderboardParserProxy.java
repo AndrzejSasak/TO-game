@@ -1,18 +1,23 @@
 package com.game.leaderboard;
 
 import com.game.controllers.PlayerEntityController;
+import com.game.entities.Entity;
 import jakarta.xml.bind.JAXBException;
 
 public class LeaderboardParserProxy implements ILeadeboardParser {
 
     private LeaderboardParser leaderboardParser;
-    private final PlayerEntityController playerEntityController;
+    private Entity player;
 
-    public LeaderboardParserProxy(PlayerEntityController playerEntityController) throws JAXBException {
+    public LeaderboardParserProxy() {
+        leaderboardParser = new LeaderboardParser();
+    }
+
+    public LeaderboardParserProxy(Entity player) throws JAXBException {
         if(isPlayerLoggedIn()) {
             leaderboardParser=  new LeaderboardParser();
         }
-        this.playerEntityController = playerEntityController;
+        this.player = player;
     }
 
     private boolean isPlayerLoggedIn() {

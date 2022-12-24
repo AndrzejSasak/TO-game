@@ -5,7 +5,12 @@ import com.game.controllers.RemotePlayerEntityController;
 import com.game.entities.Archer;
 import com.game.entities.Entity;
 import com.game.entities.User;
+import com.game.entities.User;
+import com.game.leaderboard.ILeadeboardParser;
+import com.game.leaderboard.Leaderboard;
+import com.game.leaderboard.LeaderboardParserProxy;
 import com.game.sharedUserInterface.LocalMessages;
+import jakarta.xml.bind.JAXBException;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Random;
@@ -92,6 +97,7 @@ public class Server{
         serverState = ServerState.STARTING_GAME;
 
         dotPrintService.stopTimer();
+        ioManager = new IOManager(clientSocket);
         beginGame();
         serverState = ServerState.GAME_IN_PROGRESS;
         progressRound();
@@ -110,6 +116,7 @@ public class Server{
         System.out.println("Game ended with result: "+player1Score+" "+player2Score);
         System.out.println(player1Score>player2Score ? MultiplayerAction.WON_GAME : MultiplayerAction.LOST_GAME);
         winnerPlayerOne = player1Score>player2Score;
+        endGame();
         serverState = ServerState.END_GAME;
     }
 
@@ -192,7 +199,7 @@ public class Server{
     }
 
     private void proceedClientMove(){
-        System.out.println("Waiting for "+ playerTwo.getName() + " move");
+        System.out.println("Waiting for "+ playerTwo.getName() + "move");
         ioManager.sendMessage(MultiplayerAction.CLIENT_TURN);
         String line;
         try{
@@ -227,15 +234,5 @@ public class Server{
     private void endGame() {
         ioManager.sendMessage(MultiplayerAction.END_OF_GAME);
         //TODO:update leaderboard
-        if(winnerPlayerOne){
-            RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) playerOne.getController();
-            User user = remotePlayerEntityController.getEntityOwner();
-        }
-
-        try {
-            serverSocket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
