@@ -13,6 +13,7 @@ import com.game.sharedUserInterface.LocalMessages;
 import jakarta.xml.bind.JAXBException;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -234,5 +235,27 @@ public class Server{
     private void endGame() {
         ioManager.sendMessage(MultiplayerAction.END_OF_GAME);
         //TODO:update leaderboard
+        ILeadeboardParser leadeboardParser = new LeaderboardParserProxy();
+
+        try {
+            Leaderboard leaderboard = leadeboardParser.readLeaderboard();
+            System.out.println(leaderboard);
+            addPlayerToLeaderboard(leaderboard, this.playerOne);
+            addPlayerToLeaderboard(leaderboard, this.playerTwo);
+            System.out.println(leaderboard);
+            leadeboardParser.saveLeaderboard(leaderboard);
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void addPlayerToLeaderboard(Leaderboard leaderboard, Entity player) {
+        Optional<User> userOptional = player.getController().getRealPlayerEntityOwner();
+        if(userOptional.isPresent()) {
+            User user = userOptional.get();
+            leaderboard.getUsers().remove(user);
+            leaderboard.addUser(user);
+        }
     }
 }
