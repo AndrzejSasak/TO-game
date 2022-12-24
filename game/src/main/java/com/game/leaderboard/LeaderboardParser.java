@@ -34,9 +34,7 @@ public class LeaderboardParser implements ILeadeboardParser {
         String json = getJsonStringFromResponse(response);
         Set<User> users = getUserSet(json);
         Leaderboard leaderboard = new Leaderboard();
-        Set<User> usersTreeSet = new TreeSet<>(Comparator.comparing(User::getHighScore).reversed());
-        usersTreeSet.addAll(users);
-        leaderboard.setUsers(usersTreeSet);
+        leaderboard.setUsers(users);
 
         return leaderboard;
     }
@@ -97,7 +95,7 @@ public class LeaderboardParser implements ILeadeboardParser {
     }
 
     private Set<User> getUserSet(String json) {
-        Set<User> users = new TreeSet<>(Comparator.comparing(User::getHighScore).reversed());
+        Set<User> users = new TreeSet<>(Comparator.comparing(User::getLogin));
         try {
             users = new ObjectMapper().readValue(json, new TypeReference<>() {});
         } catch (JsonProcessingException e) {

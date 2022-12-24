@@ -20,8 +20,9 @@ public class RemotePlayerEntityController implements AbstractEntityController{
         this.entityOwner = entityOwner;
     }
 
-    public User getEntityOwner() {
-        return entityOwner;
+    @Override
+    public Optional<User> getRealPlayerEntityOwner() {
+        return Optional.of(this.entityOwner);
     }
 
     @Override

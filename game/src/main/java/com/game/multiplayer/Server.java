@@ -1,15 +1,16 @@
 package com.game.multiplayer;
 
-import com.game.controllers.PlayerEntityController;
 import com.game.controllers.RemotePlayerEntityController;
-import com.game.entities.Archer;
 import com.game.entities.Entity;
+import com.game.entities.User;
+import com.game.leaderboard.ILeadeboardParser;
+import com.game.leaderboard.Leaderboard;
+import com.game.leaderboard.LeaderboardParserProxy;
 import com.game.sharedUserInterface.LocalMessages;
+import jakarta.xml.bind.JAXBException;
 
-import java.io.ByteArrayOutputStream;
+import java.util.Optional;
 import java.util.Random;
-import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -81,6 +82,7 @@ public class Server{
         ioManager.sendMessage(MultiplayerAction.END_OF_GAME);
         System.out.println("Game ended with result: "+player1Score+" "+player2Score);
         System.out.println(player1Score>player2Score ? MultiplayerAction.WON_GAME : MultiplayerAction.LOST_GAME);
+        endGame();
 
         serverState = ServerState.END_GAME;
     }
@@ -198,6 +200,28 @@ public class Server{
 
     private void endGame() {
         ioManager.sendMessage(MultiplayerAction.END_OF_GAME);
-        //TODO:update leaderboard
+        ILeadeboardParser leadeboardParser = new LeaderboardParserProxy();
+
+        try {
+            Leaderboard leaderboard = leadeboardParser.readLeaderboard();
+            System.out.println(leaderboard);
+            addPlayerToLeaderboard(leaderboard, this.playerOne);
+            addPlayerToLeaderboard(leaderboard, this.playerTwo);
+            System.out.println(leaderboard);
+            leadeboardParser.saveLeaderboard(leaderboard);
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void addPlayerToLeaderboard(Leaderboard leaderboard, Entity player) {
+        Optional<User> userOptional = player.getController().getRealPlayerEntityOwner();
+        if(userOptional.isPresent()) {
+            User user = userOptional.get();
+            leaderboard.getUsers().remove(user);
+            leaderboard.addUser(user);
+        }
+
     }
 }

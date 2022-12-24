@@ -22,9 +22,7 @@ public class PlayerEntityController implements AbstractEntityController {
         this.entityOwner = entityOwner;
     }
 
-    public User getEntityOwner() {
-        return entityOwner;
-    }
+
 
     @Override
     public Optional<Entity> getNextTarget(Entity entity, List<Entity> allFriends, List<Entity> allEnemies) {
@@ -43,6 +41,11 @@ public class PlayerEntityController implements AbstractEntityController {
         commandExecutor.executeCommand(targetSelectionCommand);
 
         return targetSelectionCommand.getSelectedTarget();
+    }
+
+    @Override
+    public Optional<User> getRealPlayerEntityOwner() {
+        return Optional.of(this.entityOwner);
     }
 
     private void printPossibleOptions(List<Entity> allEnemies) {
