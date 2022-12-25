@@ -30,8 +30,12 @@ public class Client{
         this.player = player;
 
 
-
-        clientJoinGame();
+        try {
+            clientJoinGame();
+        }
+        catch (IOException e){
+            System.out.println("Connection lost! Backing to main menu!");
+        }
     }
 
     public void clientJoinGame() throws IOException {
@@ -173,7 +177,6 @@ public class Client{
                 return true;
             }
         } catch (IOException e) {
-            e.printStackTrace();
             return false;
         }
         return false;
