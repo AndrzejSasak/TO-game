@@ -7,6 +7,7 @@ import com.game.entities.Entity;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +40,12 @@ public class Client{
         fromServer = ioManager.readMessage();
         boolean serverStartRound = fromServer.equals(MultiplayerAction.SERVER);
         while(true){
-            ProcessRound(serverStartRound);
+            try {
+                ProcessRound(serverStartRound);
+            }
+            catch (SocketException e){
+                System.out.println("Connection Lost!");
+            }
             fromServer = ioManager.readMessage();
             if(fromServer.equals(MultiplayerAction.END_OF_GAME)){
                 break;
@@ -54,7 +60,7 @@ public class Client{
         }
     }
 
-    private void ProcessRound(boolean bServerStart) throws IOException{
+    private void ProcessRound(boolean bServerStart) throws IOException, SocketException{
         if(bServerStart) {
             ProcessRoundServerStart();
         }
@@ -73,7 +79,7 @@ public class Client{
         System.out.println("After round " + roundNumber + "Score: "+ "me"+ " " + myScore+" - "+ otherPlayerScore + " " + "opponent");
     }
 
-    private void ProcessRoundServerStart() throws IOException{
+    private void ProcessRoundServerStart() throws IOException, SocketException{
         RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) player.getController();
         String fromServer;
         System.out.println(ioManager.readMessage());
@@ -90,7 +96,7 @@ public class Client{
         }
     }
 
-    private void ProcessRoundClientStart() throws IOException{
+    private void ProcessRoundClientStart() throws IOException, SocketException{
         String fromServer;
         fromServer = ioManager.readMessage();
         RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) player.getController();
@@ -109,7 +115,7 @@ public class Client{
         }
     }
 
-    private void PerformAction(RemotePlayerEntityController remotePlayerEntityController, Entity player){
+    private void PerformAction(RemotePlayerEntityController remotePlayerEntityController, Entity player) throws SocketException {
         remotePlayerEntityController.performMultiplayerAction(player);
         ioManager.sendMessage(player.bWantsToAttack ? MultiplayerAction.ATTACK : MultiplayerAction.WAIT);
         player.setCritical(!player.bWantsToAttack);

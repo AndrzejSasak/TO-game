@@ -8,6 +8,8 @@ import com.game.entities.User;
 import com.game.sharedUserInterface.LocalMessages;
 
 import java.io.ByteArrayOutputStream;
+import java.net.SocketException;
+import java.security.spec.ECField;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -49,12 +51,17 @@ public class Server{
          serverSocket = new ServerSocket(5000);
     }
 
-    public void Setup(Entity player) throws IOException, InterruptedException {
+    public void Setup(Entity player){
         this.playerOne = player;
-        gameLoop();
+        try{
+            gameLoop();
+        }
+        catch(Exception e){
+            System.out.println("Connection lost! Backing to main menu!");
+        }
     }
 
-    private void gameLoop() throws IOException, InterruptedException {
+    private void gameLoop() throws IOException, InterruptedException, SocketException {
         serverState = ServerState.WAIT_FOR_CONNECTION;
 
         System.out.println("Waiting for opponent");
@@ -65,7 +72,7 @@ public class Server{
             ioManager = new IOManager(clientSocket);
         }
         catch (Exception E){
-
+            System.out.println("Unable to create io manager!");
         }
 
         String fromClient = "";
@@ -79,12 +86,6 @@ public class Server{
             if(ioManager != null) {
                 ioManager.sendMessage("Close");
             }
-            /*try {
-                serverSocket.close();
-            }
-            catch (Exception e) {
-                System.out.println("Already closed!");
-            }*/
             clientSocket = serverSocket.accept();
             ioManager = new IOManager(clientSocket);
             fromClient = ioManager.readMessage();
@@ -113,13 +114,13 @@ public class Server{
         serverState = ServerState.END_GAME;
     }
 
-    private void beginGame() {
+    private void beginGame() throws SocketException{
         try {
             playerTwo = (Entity)ioManager.receiveObject();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Unable to perform io action!");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            System.out.println("Provided class for cast is not supported type");
         }
         Random random = new Random();
         roleStartedLastRound = random.nextBoolean() ? NetRole.SERVER : NetRole.CLIENT;
@@ -133,7 +134,7 @@ public class Server{
         roundNumber++;
     }
 
-    private void progressRound() {
+    private void progressRound() throws SocketException{
         boolean bAnyPlayerDead = false;
         RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) playerOne.getController();
         while (!bAnyPlayerDead){
@@ -155,7 +156,7 @@ public class Server{
         }
     }
 
-    private void onEndRound(){
+    private void onEndRound() throws SocketException{
         boolean bClientWinner = false;
         if(playerTwo.isDead()) {
             player1Score++;
@@ -175,7 +176,7 @@ public class Server{
         }
     }
 
-    private void proceedServerMove(RemotePlayerEntityController remotePlayerEntityController){
+    private void proceedServerMove(RemotePlayerEntityController remotePlayerEntityController) throws SocketException{
         remotePlayerEntityController.performMultiplayerAction(playerOne);
         if(playerOne.bWantsToAttack){
             int dmg = playerTwo.getHp();
@@ -191,7 +192,7 @@ public class Server{
         }
     }
 
-    private void proceedClientMove(){
+    private void proceedClientMove() throws SocketException{
         System.out.println("Waiting for "+ playerTwo.getName() + " move");
         ioManager.sendMessage(MultiplayerAction.CLIENT_TURN);
         String line;
@@ -218,13 +219,14 @@ public class Server{
                         playerTwo.getName() +" (" + playerTwo.getHp() + "/" + playerTwo.getMaxHp() + ") " + playerOne.getName() +" (" + playerOne.getHp() + "/" + playerOne.getMaxHp() + ")");
             }
         }
-        catch (Exception e){
-            e.printStackTrace();
+        catch (IOException e){
+            System.out.println("Unable to perform socket action!");
+            throw new SocketException();
         }
 
     }
 
-    private void endGame() {
+    private void endGame() throws SocketException{
         ioManager.sendMessage(MultiplayerAction.END_OF_GAME);
         //TODO:update leaderboard
         if(winnerPlayerOne){
@@ -235,7 +237,7 @@ public class Server{
         try {
             serverSocket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Server socket already closed!");
         }
     }
 }

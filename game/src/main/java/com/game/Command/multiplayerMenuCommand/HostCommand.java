@@ -15,12 +15,6 @@ public class HostCommand implements IMenuCommand{
     @Override
     public void execute() {
         Server server = Server.getInstance();
-        try {
-            server.Setup(player);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        server.Setup(player);
     }
 }

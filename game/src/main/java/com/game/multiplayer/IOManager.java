@@ -2,6 +2,7 @@ package com.game.multiplayer;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class IOManager {
     private ObjectOutputStream objectOut;
@@ -18,20 +19,20 @@ public class IOManager {
          bf = new BufferedReader(in);
     }
 
-    public void sendMessage(String message) {
+    public void sendMessage(String message) throws SocketException {
         pr.println(message);
         pr.flush();
     }
 
-    public void sendObject(Object object) throws IOException {
+    public void sendObject(Object object) throws IOException, SocketException {
         objectOut.writeObject(object);
     }
 
-    public Object receiveObject() throws IOException, ClassNotFoundException {
+    public Object receiveObject() throws IOException, ClassNotFoundException, SocketException {
         return objectIn.readObject();
     }
 
-    public String readMessage() throws IOException {
+    public String readMessage() throws IOException, SocketException {
         return bf.readLine();
     }
 }
