@@ -5,11 +5,17 @@ import com.game.controllers.RemotePlayerEntityController;
 import com.game.entities.Archer;
 import com.game.entities.Entity;
 import com.game.entities.User;
+import com.game.entities.User;
+import com.game.leaderboard.ILeadeboardParser;
+import com.game.leaderboard.Leaderboard;
+import com.game.leaderboard.LeaderboardParserProxy;
 import com.game.sharedUserInterface.LocalMessages;
+import jakarta.xml.bind.JAXBException;
 
 import java.io.ByteArrayOutputStream;
 import java.net.SocketException;
 import java.security.spec.ECField;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -48,7 +54,7 @@ public class Server{
     }
 
     private Server() throws IOException {
-         serverSocket = new ServerSocket(5000);
+        serverSocket = new ServerSocket(5000);
     }
 
     public void Setup(Entity player){
@@ -58,6 +64,7 @@ public class Server{
         }
         catch(Exception e){
             System.out.println("Connection lost! Backing to main menu!");
+            e.printStackTrace();
         }
     }
 
@@ -111,6 +118,7 @@ public class Server{
         System.out.println("Game ended with result: "+player1Score+" "+player2Score);
         System.out.println(player1Score>player2Score ? MultiplayerAction.WON_GAME : MultiplayerAction.LOST_GAME);
         winnerPlayerOne = player1Score>player2Score;
+        endGame();
         serverState = ServerState.END_GAME;
     }
 
@@ -229,15 +237,27 @@ public class Server{
     private void endGame() throws SocketException{
         ioManager.sendMessage(MultiplayerAction.END_OF_GAME);
         //TODO:update leaderboard
-        if(winnerPlayerOne){
-            RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) playerOne.getController();
-            User user = remotePlayerEntityController.getEntityOwner();
-        }
+        ILeadeboardParser leadeboardParser = new LeaderboardParserProxy();
 
         try {
-            serverSocket.close();
-        } catch (IOException e) {
-            System.out.println("Server socket already closed!");
+            Leaderboard leaderboard = leadeboardParser.readLeaderboard();
+            System.out.println(leaderboard);
+            addPlayerToLeaderboard(leaderboard, this.playerOne);
+            addPlayerToLeaderboard(leaderboard, this.playerTwo);
+            System.out.println(leaderboard);
+            leadeboardParser.saveLeaderboard(leaderboard);
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void addPlayerToLeaderboard(Leaderboard leaderboard, Entity player) {
+        Optional<User> userOptional = player.getController().getRealPlayerEntityOwner();
+        if(userOptional.isPresent()) {
+            User user = userOptional.get();
+            leaderboard.getUsers().remove(user);
+            leaderboard.addUser(user);
         }
     }
 }

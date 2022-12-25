@@ -1,17 +1,12 @@
 package com.game.menu;
 
-import com.game.Command.CommandExecutor;
-import com.game.Command.SelectModeCommand;
-import com.game.Command.ShowLeaderboardCommand;
 import com.game.Command.multiplayerMenuCommand.HostCommand;
 import com.game.Command.multiplayerMenuCommand.JoinCommand;
 import com.game.controllers.PlayerEntityController;
 import com.game.controllers.RemotePlayerEntityController;
 import com.game.entities.Entity;
-import com.game.gamemode.GameMode;
 import com.game.sharedUserInterface.LocalMessages;
 
-import javax.print.attribute.standard.JobName;
 import java.util.Scanner;
 
 public class MultiplayerMenu extends IMenu{
@@ -20,7 +15,7 @@ public class MultiplayerMenu extends IMenu{
         super();
         this.player = player;
         PlayerEntityController playerEntityController = (PlayerEntityController) player.getController();
-        this.player.setController(new RemotePlayerEntityController(playerEntityController.getEntityOwner()));
+        this.player.setController(new RemotePlayerEntityController(playerEntityController.getRealPlayerEntityOwner().get()));
     }
 
     @Override

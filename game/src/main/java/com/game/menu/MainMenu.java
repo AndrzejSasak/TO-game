@@ -44,7 +44,7 @@ public class MainMenu extends IMenu{
                     commandExecutor.executeCommand(selectMultiModeCommand);
                     break;
                 case "3":
-                    commandExecutor.executeCommand(new ShowLeaderboardCommand((PlayerEntityController) player.getController()));
+                    commandExecutor.executeCommand(new ShowLeaderboardCommand(player));
                     break;
                 case "4":
                     player = new SelectEntityType().updateEntity(player);
