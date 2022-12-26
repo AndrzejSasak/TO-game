@@ -14,15 +14,19 @@ public class LeaderboardParserProxy implements ILeadeboardParser {
     }
 
     public LeaderboardParserProxy(Entity player) throws JAXBException {
+        this.player = player;
+
         if(isPlayerLoggedIn()) {
             leaderboardParser=  new LeaderboardParser();
         }
-        this.player = player;
     }
 
     private boolean isPlayerLoggedIn() {
-        //TODO: check if user is playing with or without login
-        return true;
+        if(player.getController().getRealPlayerEntityOwner().isPresent()) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override
