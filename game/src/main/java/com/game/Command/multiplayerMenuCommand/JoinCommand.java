@@ -56,7 +56,7 @@ public class JoinCommand implements IMenuCommand{
             Client newClient = new Client(clientSocket, ioManager, this.player);
         }
         catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Unable to join to the game!");
         }
     }
 }

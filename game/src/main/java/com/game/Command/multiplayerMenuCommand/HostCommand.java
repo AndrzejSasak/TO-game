@@ -15,12 +15,10 @@ public class HostCommand implements IMenuCommand{
     @Override
     public void execute() {
         Server server = Server.getInstance();
-        try {
-            server.Setup(player);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if(server == null){
+            System.out.println("Cannot create server! Backing to main menu!");
+            return;
         }
+        server.Setup(player);
     }
 }

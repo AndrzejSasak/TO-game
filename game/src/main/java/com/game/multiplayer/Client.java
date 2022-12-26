@@ -7,6 +7,7 @@ import com.game.entities.Entity;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,8 +30,12 @@ public class Client{
         this.player = player;
 
 
-
-        clientJoinGame();
+        try {
+            clientJoinGame();
+        }
+        catch (IOException e){
+            System.out.println("Connection lost! Backing to main menu!");
+        }
     }
 
     public void clientJoinGame() throws IOException {
@@ -39,7 +44,12 @@ public class Client{
         fromServer = ioManager.readMessage();
         boolean serverStartRound = fromServer.equals(MultiplayerAction.SERVER);
         while(true){
-            ProcessRound(serverStartRound);
+            try {
+                ProcessRound(serverStartRound);
+            }
+            catch (SocketException e){
+                System.out.println("Connection Lost!");
+            }
             fromServer = ioManager.readMessage();
             if(fromServer.equals(MultiplayerAction.END_OF_GAME)){
                 break;
@@ -54,7 +64,7 @@ public class Client{
         }
     }
 
-    private void ProcessRound(boolean bServerStart) throws IOException{
+    private void ProcessRound(boolean bServerStart) throws IOException, SocketException{
         if(bServerStart) {
             ProcessRoundServerStart();
         }
@@ -70,12 +80,14 @@ public class Client{
             otherPlayerScore++;
             System.out.println(MultiplayerAction.LOST_ROUND);
         }
-        System.out.println("After round " + roundNumber + "Score: "+ "me"+ " " + myScore+" - "+ otherPlayerScore + " " + "opponent");
+        roundNumber++;
+        System.out.println("After round " + roundNumber + " Score: "+ "me"+ " " + myScore+" - "+ otherPlayerScore + " " + "opponent");
     }
 
-    private void ProcessRoundServerStart() throws IOException{
+    private void ProcessRoundServerStart() throws IOException, SocketException{
         RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) player.getController();
         String fromServer;
+        System.out.println("Waiting for opponent move!");
         System.out.println(ioManager.readMessage());
         fromServer = ioManager.readMessage();
         while(fromServer != null){
@@ -85,19 +97,29 @@ public class Client{
             }
             PerformAction(remotePlayerEntityController, player);
             System.out.println(ioManager.readMessage());
-            System.out.println(ioManager.readMessage());
+            System.out.println("Waiting for opponent move!");
+            fromServer = ioManager.readMessage();
+            if(fromServer.equals(MultiplayerAction.END_OF_ROUND))
+            {
+                return;
+            }
+            System.out.println(fromServer);
             fromServer = ioManager.readMessage();
         }
     }
 
-    private void ProcessRoundClientStart() throws IOException{
+    private void ProcessRoundClientStart() throws IOException, SocketException{
         String fromServer;
         fromServer = ioManager.readMessage();
         RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) player.getController();
         PerformAction(remotePlayerEntityController, player);
         System.out.println(ioManager.readMessage());
+        System.out.println("Waiting for opponent move!");
         fromServer = ioManager.readMessage();
         while(fromServer != null){
+            if(fromServer.equals(MultiplayerAction.END_OF_ROUND)) {
+                return;
+            }
             System.out.println(fromServer);
             fromServer = ioManager.readMessage();
             if(fromServer.equals(MultiplayerAction.END_OF_ROUND)) {
@@ -105,11 +127,12 @@ public class Client{
             }
             PerformAction(remotePlayerEntityController, player);
             System.out.println(ioManager.readMessage());
+            System.out.println("Waiting for opponent move!");
             fromServer = ioManager.readMessage();
         }
     }
 
-    private void PerformAction(RemotePlayerEntityController remotePlayerEntityController, Entity player){
+    private void PerformAction(RemotePlayerEntityController remotePlayerEntityController, Entity player) throws SocketException {
         remotePlayerEntityController.performMultiplayerAction(player);
         ioManager.sendMessage(player.bWantsToAttack ? MultiplayerAction.ATTACK : MultiplayerAction.WAIT);
         player.setCritical(!player.bWantsToAttack);
@@ -167,7 +190,6 @@ public class Client{
                 return true;
             }
         } catch (IOException e) {
-            e.printStackTrace();
             return false;
         }
         return false;

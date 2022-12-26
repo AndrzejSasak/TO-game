@@ -13,13 +13,20 @@ import com.game.sharedUserInterface.LocalMessages;
 import jakarta.xml.bind.JAXBException;
 
 import java.io.ByteArrayOutputStream;
+import java.net.SocketException;
+import java.security.spec.ECField;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import static java.lang.Math.abs;
+import static java.lang.Math.random;
 
 //listen server
 public class Server{
@@ -52,15 +59,21 @@ public class Server{
     }
 
     private Server() throws IOException {
-         serverSocket = new ServerSocket(5000);
+        serverSocket = new ServerSocket(5000);
     }
 
-    public void Setup(Entity player) throws IOException, InterruptedException {
+    public void Setup(Entity player){
         this.playerOne = player;
-        gameLoop();
+        try{
+            gameLoop();
+        }
+        catch(Exception e){
+            System.out.println("Connection lost! Backing to main menu!");
+            e.printStackTrace();
+        }
     }
 
-    private void gameLoop() throws IOException, InterruptedException {
+    private void gameLoop() throws IOException, InterruptedException, SocketException {
         serverState = ServerState.WAIT_FOR_CONNECTION;
 
         System.out.println("Waiting for opponent");
@@ -71,7 +84,7 @@ public class Server{
             ioManager = new IOManager(clientSocket);
         }
         catch (Exception E){
-
+            System.out.println("Unable to create io manager!");
         }
 
         String fromClient = "";
@@ -85,12 +98,6 @@ public class Server{
             if(ioManager != null) {
                 ioManager.sendMessage("Close");
             }
-            /*try {
-                serverSocket.close();
-            }
-            catch (Exception e) {
-                System.out.println("Already closed!");
-            }*/
             clientSocket = serverSocket.accept();
             ioManager = new IOManager(clientSocket);
             fromClient = ioManager.readMessage();
@@ -98,7 +105,6 @@ public class Server{
         serverState = ServerState.STARTING_GAME;
 
         dotPrintService.stopTimer();
-        ioManager = new IOManager(clientSocket);
         beginGame();
         serverState = ServerState.GAME_IN_PROGRESS;
         progressRound();
@@ -121,14 +127,16 @@ public class Server{
         serverState = ServerState.END_GAME;
     }
 
-    private void beginGame() {
+    private void beginGame() throws SocketException{
         try {
             playerTwo = (Entity)ioManager.receiveObject();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Unable to perform io action!");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            System.out.println("Provided class for cast is not supported type");
         }
+        player1Score = 0;
+        player2Score = 0;
         Random random = new Random();
         roleStartedLastRound = random.nextBoolean() ? NetRole.SERVER : NetRole.CLIENT;
         String toSend = roleStartedLastRound == NetRole.SERVER ? MultiplayerAction.SERVER : MultiplayerAction.CLIENT;
@@ -141,7 +149,7 @@ public class Server{
         roundNumber++;
     }
 
-    private void progressRound() {
+    private void progressRound() throws SocketException{
         boolean bAnyPlayerDead = false;
         RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) playerOne.getController();
         while (!bAnyPlayerDead){
@@ -163,7 +171,7 @@ public class Server{
         }
     }
 
-    private void onEndRound(){
+    private void onEndRound() throws SocketException{
         boolean bClientWinner = false;
         if(playerTwo.isDead()) {
             player1Score++;
@@ -183,7 +191,7 @@ public class Server{
         }
     }
 
-    private void proceedServerMove(RemotePlayerEntityController remotePlayerEntityController){
+    private void proceedServerMove(RemotePlayerEntityController remotePlayerEntityController) throws SocketException{
         remotePlayerEntityController.performMultiplayerAction(playerOne);
         if(playerOne.bWantsToAttack){
             int dmg = playerTwo.getHp();
@@ -199,8 +207,8 @@ public class Server{
         }
     }
 
-    private void proceedClientMove(){
-        System.out.println("Waiting for "+ playerTwo.getName() + "move");
+    private void proceedClientMove() throws SocketException{
+        System.out.println("Waiting for "+ playerTwo.getName() + " move");
         ioManager.sendMessage(MultiplayerAction.CLIENT_TURN);
         String line;
         try{
@@ -226,20 +234,21 @@ public class Server{
                         playerTwo.getName() +" (" + playerTwo.getHp() + "/" + playerTwo.getMaxHp() + ") " + playerOne.getName() +" (" + playerOne.getHp() + "/" + playerOne.getMaxHp() + ")");
             }
         }
-        catch (Exception e){
-            e.printStackTrace();
+        catch (IOException e){
+            System.out.println("Unable to perform socket action!");
+            throw new SocketException();
         }
 
     }
 
-    private void endGame() {
+    private void endGame() throws SocketException{
         ioManager.sendMessage(MultiplayerAction.END_OF_GAME);
-        //TODO:update leaderboard
         ILeadeboardParser leadeboardParser = new LeaderboardParserProxy();
 
         try {
             Leaderboard leaderboard = leadeboardParser.readLeaderboard();
             System.out.println(leaderboard);
+            UpdateLeaderboard(leaderboard);
             addPlayerToLeaderboard(leaderboard, this.playerOne);
             addPlayerToLeaderboard(leaderboard, this.playerTwo);
             System.out.println(leaderboard);
@@ -256,6 +265,73 @@ public class Server{
             User user = userOptional.get();
             leaderboard.getUsers().remove(user);
             leaderboard.addUser(user);
+        }
+    }
+
+    private void UpdateLeaderboard(Leaderboard leaderboard){
+        Optional<User> userOneOptional = playerOne.getController().getRealPlayerEntityOwner();
+        Optional<User> userTwoOptional = playerTwo.getController().getRealPlayerEntityOwner();
+        if(userOneOptional.isPresent() && userTwoOptional.isPresent()){
+            User userOne = userOneOptional.get();
+            User userTwo = userTwoOptional.get();
+            Set<User> userSet = leaderboard.getUsers();
+            long userOneScore = 0;
+            long userTwoScore = 0;
+            for(User currentUser : userSet){
+                if(currentUser.getLogin().equals(userOne.getLogin())){
+                    userOneScore = currentUser.getHighScore();
+                }
+                if(currentUser.getLogin().equals(userTwo.getLogin())){
+                    userTwoScore = currentUser.getHighScore();
+                }
+            }
+            long scoreChange = 0;
+            long scoreDiff = abs(userOneScore - userTwoScore);
+            boolean userOneHasHigherScore = userOneScore > userTwoScore;
+            if((userOneHasHigherScore && winnerPlayerOne) || (!userOneHasHigherScore && !winnerPlayerOne))
+            {
+                if(scoreDiff > 800){
+                    scoreChange = ThreadLocalRandom.current().nextInt(1, 4);
+                }
+                else if(scoreDiff > 400){
+                    scoreChange = ThreadLocalRandom.current().nextInt(3, 8);
+                }
+                else if(scoreDiff > 150){
+                    scoreChange = ThreadLocalRandom.current().nextInt(7, 12);
+                }
+                else if(scoreDiff > 50){
+                    scoreChange = ThreadLocalRandom.current().nextInt(11, 16);
+                }
+                else{
+                    scoreChange = ThreadLocalRandom.current().nextInt(15, 26);
+                }
+            }
+            else
+            {
+                if(scoreDiff > 800){
+                    scoreChange = ThreadLocalRandom.current().nextInt(40, 51);
+                }
+                else if(scoreDiff > 400){
+                    scoreChange = ThreadLocalRandom.current().nextInt(25, 36);
+                }
+                else if(scoreDiff > 150){
+                    scoreChange = ThreadLocalRandom.current().nextInt(7, 12);
+                }
+                else if(scoreDiff > 50){
+                    scoreChange = ThreadLocalRandom.current().nextInt(11, 16);
+                }
+                else{
+                    scoreChange = ThreadLocalRandom.current().nextInt(15, 26);
+                }
+            }
+            if(winnerPlayerOne) {
+                userOne.setHighScore(userOneScore + scoreChange > 2000 ? 2000 : userOneScore + scoreChange);
+                userTwo.setHighScore(userTwoScore - scoreChange < 0 ? 0 : userTwoScore - scoreChange);
+            }
+            else{
+                userOne.setHighScore(userOneScore - scoreChange < 0 ? 0 : userOneScore - scoreChange);
+                userTwo.setHighScore(userTwoScore + scoreChange > 2000 ? 2000 : userTwoScore + scoreChange);
+            }
         }
     }
 }
