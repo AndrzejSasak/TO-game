@@ -80,12 +80,14 @@ public class Client{
             otherPlayerScore++;
             System.out.println(MultiplayerAction.LOST_ROUND);
         }
-        System.out.println("After round " + roundNumber + "Score: "+ "me"+ " " + myScore+" - "+ otherPlayerScore + " " + "opponent");
+        roundNumber++;
+        System.out.println("After round " + roundNumber + " Score: "+ "me"+ " " + myScore+" - "+ otherPlayerScore + " " + "opponent");
     }
 
     private void ProcessRoundServerStart() throws IOException, SocketException{
         RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) player.getController();
         String fromServer;
+        System.out.println("Waiting for opponent move!");
         System.out.println(ioManager.readMessage());
         fromServer = ioManager.readMessage();
         while(fromServer != null){
@@ -95,7 +97,13 @@ public class Client{
             }
             PerformAction(remotePlayerEntityController, player);
             System.out.println(ioManager.readMessage());
-            System.out.println(ioManager.readMessage());
+            System.out.println("Waiting for opponent move!");
+            fromServer = ioManager.readMessage();
+            if(fromServer.equals(MultiplayerAction.END_OF_ROUND))
+            {
+                return;
+            }
+            System.out.println(fromServer);
             fromServer = ioManager.readMessage();
         }
     }
@@ -106,8 +114,12 @@ public class Client{
         RemotePlayerEntityController remotePlayerEntityController = (RemotePlayerEntityController) player.getController();
         PerformAction(remotePlayerEntityController, player);
         System.out.println(ioManager.readMessage());
+        System.out.println("Waiting for opponent move!");
         fromServer = ioManager.readMessage();
         while(fromServer != null){
+            if(fromServer.equals(MultiplayerAction.END_OF_ROUND)) {
+                return;
+            }
             System.out.println(fromServer);
             fromServer = ioManager.readMessage();
             if(fromServer.equals(MultiplayerAction.END_OF_ROUND)) {
@@ -115,6 +127,7 @@ public class Client{
             }
             PerformAction(remotePlayerEntityController, player);
             System.out.println(ioManager.readMessage());
+            System.out.println("Waiting for opponent move!");
             fromServer = ioManager.readMessage();
         }
     }

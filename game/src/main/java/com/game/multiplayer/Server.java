@@ -18,10 +18,15 @@ import java.security.spec.ECField;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import static java.lang.Math.abs;
+import static java.lang.Math.random;
 
 //listen server
 public class Server{
@@ -130,6 +135,8 @@ public class Server{
         } catch (ClassNotFoundException e) {
             System.out.println("Provided class for cast is not supported type");
         }
+        player1Score = 0;
+        player2Score = 0;
         Random random = new Random();
         roleStartedLastRound = random.nextBoolean() ? NetRole.SERVER : NetRole.CLIENT;
         String toSend = roleStartedLastRound == NetRole.SERVER ? MultiplayerAction.SERVER : MultiplayerAction.CLIENT;
@@ -236,12 +243,12 @@ public class Server{
 
     private void endGame() throws SocketException{
         ioManager.sendMessage(MultiplayerAction.END_OF_GAME);
-        //TODO:update leaderboard
         ILeadeboardParser leadeboardParser = new LeaderboardParserProxy();
 
         try {
             Leaderboard leaderboard = leadeboardParser.readLeaderboard();
             System.out.println(leaderboard);
+            UpdateLeaderboard(leaderboard);
             addPlayerToLeaderboard(leaderboard, this.playerOne);
             addPlayerToLeaderboard(leaderboard, this.playerTwo);
             System.out.println(leaderboard);
@@ -258,6 +265,73 @@ public class Server{
             User user = userOptional.get();
             leaderboard.getUsers().remove(user);
             leaderboard.addUser(user);
+        }
+    }
+
+    private void UpdateLeaderboard(Leaderboard leaderboard){
+        Optional<User> userOneOptional = playerOne.getController().getRealPlayerEntityOwner();
+        Optional<User> userTwoOptional = playerTwo.getController().getRealPlayerEntityOwner();
+        if(userOneOptional.isPresent() && userTwoOptional.isPresent()){
+            User userOne = userOneOptional.get();
+            User userTwo = userTwoOptional.get();
+            Set<User> userSet = leaderboard.getUsers();
+            long userOneScore = 0;
+            long userTwoScore = 0;
+            for(User currentUser : userSet){
+                if(currentUser.getLogin().equals(userOne.getLogin())){
+                    userOneScore = currentUser.getHighScore();
+                }
+                if(currentUser.getLogin().equals(userTwo.getLogin())){
+                    userTwoScore = currentUser.getHighScore();
+                }
+            }
+            long scoreChange = 0;
+            long scoreDiff = abs(userOneScore - userTwoScore);
+            boolean userOneHasHigherScore = userOneScore > userTwoScore;
+            if((userOneHasHigherScore && winnerPlayerOne) || (!userOneHasHigherScore && !winnerPlayerOne))
+            {
+                if(scoreDiff > 800){
+                    scoreChange = ThreadLocalRandom.current().nextInt(1, 4);
+                }
+                else if(scoreDiff > 400){
+                    scoreChange = ThreadLocalRandom.current().nextInt(3, 8);
+                }
+                else if(scoreDiff > 150){
+                    scoreChange = ThreadLocalRandom.current().nextInt(7, 12);
+                }
+                else if(scoreDiff > 50){
+                    scoreChange = ThreadLocalRandom.current().nextInt(11, 16);
+                }
+                else{
+                    scoreChange = ThreadLocalRandom.current().nextInt(15, 26);
+                }
+            }
+            else
+            {
+                if(scoreDiff > 800){
+                    scoreChange = ThreadLocalRandom.current().nextInt(40, 51);
+                }
+                else if(scoreDiff > 400){
+                    scoreChange = ThreadLocalRandom.current().nextInt(25, 36);
+                }
+                else if(scoreDiff > 150){
+                    scoreChange = ThreadLocalRandom.current().nextInt(7, 12);
+                }
+                else if(scoreDiff > 50){
+                    scoreChange = ThreadLocalRandom.current().nextInt(11, 16);
+                }
+                else{
+                    scoreChange = ThreadLocalRandom.current().nextInt(15, 26);
+                }
+            }
+            if(winnerPlayerOne) {
+                userOne.setHighScore(userOneScore + scoreChange > 2000 ? 2000 : userOneScore + scoreChange);
+                userTwo.setHighScore(userTwoScore - scoreChange < 0 ? 0 : userTwoScore - scoreChange);
+            }
+            else{
+                userOne.setHighScore(userOneScore - scoreChange < 0 ? 0 : userOneScore - scoreChange);
+                userTwo.setHighScore(userTwoScore + scoreChange > 2000 ? 2000 : userTwoScore + scoreChange);
+            }
         }
     }
 }
