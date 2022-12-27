@@ -55,8 +55,8 @@ public abstract class Entity implements Serializable {
     protected void attack(Entity target, List<Entity> allFriends, List<Entity> allEnemies) {
         int attack = criticalAttack(this.attackPoints);
         attack = boostedAttack(attack, target);
-        Messages.attackMessage(this, target);
         target.getHit(attack, this, allEnemies, allFriends);
+        Messages.attackMessage(this, target);
     }
 
     protected int criticalAttack(int attack){
