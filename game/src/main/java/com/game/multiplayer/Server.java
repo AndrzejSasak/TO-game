@@ -69,7 +69,6 @@ public class Server{
         }
         catch(Exception e){
             System.out.println("Connection lost! Backing to main menu!");
-            e.printStackTrace();
         }
     }
 
