@@ -2,10 +2,7 @@ package com.game.leaderboard;
 
 import com.game.entities.User;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class Leaderboard {
 
@@ -31,7 +28,10 @@ public class Leaderboard {
     public String toString() {
         StringBuilder leaderboardBuilder = new StringBuilder("Leaderboard: \n");
 
-        for(User user : users) {
+        List<User> userList = new ArrayList<>(users);
+        userList.sort(Comparator.comparing(User::getHighScore).reversed());
+
+        for(User user : userList) {
             leaderboardBuilder.append(user.toString()).append("\n");
         }
 
