@@ -16,7 +16,6 @@ public class Login {
         System.out.print("Type player login: ");
         String login = inputReader.nextLine();
         user.setLogin(login);
-        //TODO: store state of user in some file
         entity = new SelectEntityType().createNewEntity(entity, playerEntityController);
         return entity;
     }

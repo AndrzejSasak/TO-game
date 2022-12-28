@@ -1,6 +1,7 @@
 package com.game.controllers;
 
 import com.game.Command.CommandExecutor;
+import com.game.Command.Target;
 import com.game.Command.TargetSelectionCommand;
 import com.game.entities.Entity;
 import com.game.entities.User;
@@ -26,21 +27,30 @@ public class PlayerEntityController implements AbstractEntityController {
 
     @Override
     public Optional<Entity> getNextTarget(Entity entity, List<Entity> allFriends, List<Entity> allEnemies) {
-
+        Target target = null;
         LocalMessages.displayVerticalLine();
         System.out.println("Your turn!\nYour team:");
         allFriends.forEach(friend -> System.out.println(friend.getNameInfo()));
-        printPossibleOptions(allEnemies);
+        printPossibleOptions(allEnemies.stream().filter(ent -> !ent.isDead()).toList());
         LocalMessages.displayVerticalLine();
-
-        Scanner myInput = new Scanner(System.in);
-        int chosenEnemy = myInput.nextInt();
-
         CommandExecutor commandExecutor = new CommandExecutor();
-        TargetSelectionCommand targetSelectionCommand = new TargetSelectionCommand(chosenEnemy, allEnemies);
-        commandExecutor.executeCommand(targetSelectionCommand);
 
-        return targetSelectionCommand.getSelectedTarget();
+        while(true) {
+            Scanner myInput = new Scanner(System.in);
+            int chosenEnemy = myInput.nextInt();
+
+
+            TargetSelectionCommand targetSelectionCommand = new TargetSelectionCommand(chosenEnemy, allEnemies.stream().filter(ent -> !ent.isDead()).toList());
+            commandExecutor.executeCommand(targetSelectionCommand);
+            if(targetSelectionCommand.getSelectedTarget().getEntity() != null ||
+               targetSelectionCommand.getSelectedTarget().isSkipCommand()) {
+                target = targetSelectionCommand.getSelectedTarget();
+                break;
+            }
+            System.out.println("Type valid number");
+        }
+
+        return target.isSkipCommand() ? Optional.empty() : Optional.of(target.getEntity());
     }
 
     @Override
