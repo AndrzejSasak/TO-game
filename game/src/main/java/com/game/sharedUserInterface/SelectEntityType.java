@@ -3,21 +3,20 @@ package com.game.sharedUserInterface;
 import com.game.Command.CommandExecutor;
 import com.game.Command.SelectionCharacterCommand;
 import com.game.controllers.PlayerEntityController;
-import com.game.entities.Archer;
-import com.game.entities.Entity;
-import com.game.entities.Warrior;
-import com.game.entities.Wizard;
+import com.game.entities.*;
+import com.game.entitiesFactories.EntitiesFactory;
+import com.game.entitiesFactories.PlayerEntityFactory;
 
 import java.util.Scanner;
 
 public class SelectEntityType {
     private Entity entity;
     private Entity newEntity;
-    private PlayerEntityController playerEntityControllerController;
+    private PlayerEntityController playerEntityController;
 
-    public Entity createNewEntity(Entity entity, PlayerEntityController playerEntityControllerController) {
+    public Entity createNewEntity(Entity entity, PlayerEntityController playerEntityController) {
         return this.setEntity(entity)
-                .setPlayerController(playerEntityControllerController)
+                .setPlayerController(playerEntityController)
                 .selectPlayerEntity()
                 .getEntity();
     }
@@ -30,7 +29,7 @@ public class SelectEntityType {
     }
 
     SelectEntityType setPlayerController(PlayerEntityController playerEntityControllerController) {
-        this.playerEntityControllerController = playerEntityControllerController;
+        this.playerEntityController = playerEntityControllerController;
         return this;
     }
 
@@ -42,29 +41,23 @@ public class SelectEntityType {
     SelectEntityType selectPlayerEntity() {
         boolean selection = false;
         Scanner inputReader = new Scanner(System.in);
-        displayEntityTypes();
+        PlayerEntityFactory entitiesFactory = new PlayerEntityFactory(this.playerEntityController);
+
+        entitiesFactory.displayEntityTypes();
         while( !selection ) {
-            String input[] = inputReader.nextLine().split("\s");
+            String input[] = inputReader.nextLine().split("\s", 2);
             if(!isEntity() && input.length != 2) {
                 System.out.println("Provide name for player!");
             }
             else {
-                switch (input[0]) {
-                    case "1":
-                        setNewEntity(new Archer(isEntity() ? entity.getName() : input[1], playerEntityControllerController));
-                        selection = true;
-                        break;
-                    case "2":
-                        setNewEntity(new Warrior(isEntity() ? entity.getName() : input[1], playerEntityControllerController));
-                        selection = true;
-                        break;
-                    case "3":
-                        setNewEntity(new Wizard(isEntity() ? entity.getName() : input[1], playerEntityControllerController));
-                        selection = true;
-                        break;
-                    default:
-                        System.out.println("Type valid option(number)");
-                        break;
+                String entityName = input.length == 2 ? input[1] : entity.getName();
+                Entity entity = entitiesFactory.createEntity(input[0], entityName, null);
+                if(entity != null) {
+                    setNewEntity(entity);
+                    selection = true;
+                }
+                else {
+                    System.out.println("Please type valid character class");
                 }
             }
 
@@ -82,13 +75,6 @@ public class SelectEntityType {
 
     private Entity getEntity() {
         return entity;
-    }
-
-    private void displayEntityTypes() {
-        System.out.println("Select character class and player name (add space between):");
-        System.out.println("1. Archer (can dodge attack)");
-        System.out.println("2. Warrior (can block attack)");
-        System.out.println("3. Wizard (has stronger critical attack)");
     }
 
     private boolean isEntity() {

@@ -9,13 +9,18 @@ import com.game.entities.Archer;
 import com.game.entities.Entity;
 import com.game.entities.Warrior;
 import com.game.entities.Wizard;
+import com.game.entitiesFactories.NPCEntityFactory;
+import com.game.entitiesFactories.PlayerEntityFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 public class Training implements Level {
 
     private final String playerName;
     private final Names names;
+    private NPCEntityFactory npcEntityFactory;
+    private NPCEntityFactory entityFactory = new NPCEntityFactory(new PlayerEntityController(null));
 
     public Training(String playerName){
         this.playerName = playerName;
@@ -31,6 +36,7 @@ public class Training implements Level {
 
     private void battle1() {
         String firstOpponentName = names.getRandomName();
+        npcEntityFactory = new NPCEntityFactory(new TrainingDummy(new NPCEntityController()));
 
         System.out.println("Welcome to Projekt TO training level.");
         System.out.println("Here you will learn basic combat skills.\n");
@@ -38,9 +44,9 @@ public class Training implements Level {
         System.out.println("You can attack him right away choosing the correct option\nor skip your turn in order " +
                 "to maximalize your chances of dealing critical damage\nand parring your opponents attack!" );
 
-        List<Entity> friends = List.of(new Warrior(playerName, 1, new PlayerEntityController(null)));
+        List<Entity> friends = List.of(entityFactory.createEntity("Warrior", playerName, Optional.of(1)));
         List<Entity> enemies
-                = List.of(new Archer(firstOpponentName, 1, new TrainingDummy(new NPCEntityController())));
+                = List.of(npcEntityFactory.createEntity("Archer", firstOpponentName, Optional.of(1)));
 
         Battle battle = new Battle.Builder()
                 .teamOne(friends)
@@ -56,13 +62,14 @@ public class Training implements Level {
         System.out.println("Character level can affect its abilities, try to decide if you want to" +
                 " attack weaker or stronger enemies first!");
         System.out.println("In this battle you will face multiple enemies!");
+        npcEntityFactory = new NPCEntityFactory(new NPCEntityController());
 
-        List<Entity> friends = List.of(new Wizard(playerName, 20, new PlayerEntityController(null)));
+        List<Entity> friends = List.of(entityFactory.createEntity("Warrior", playerName, Optional.of(20)));
         List<Entity> enemies = List.of(
-                new Archer(names.getRandomName(), 1, new NPCEntityController()),
-                new Archer(names.getRandomName(), 1, new NPCEntityController()),
-                new Archer(names.getRandomName(), 4, new NPCEntityController()),
-                new Archer(names.getRandomName(), 1, new NPCEntityController())
+                npcEntityFactory.createEntity("Archer", names.getRandomName(), Optional.of(1)),
+                npcEntityFactory.createEntity("Archer", names.getRandomName(), Optional.of(1)),
+                npcEntityFactory.createEntity("Archer", names.getRandomName(), Optional.of(4)),
+                npcEntityFactory.createEntity("Archer", names.getRandomName(), Optional.of(1))
         );
 
         Battle battle = new Battle.Builder()

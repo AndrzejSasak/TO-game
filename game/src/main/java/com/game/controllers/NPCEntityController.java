@@ -11,8 +11,8 @@ public class NPCEntityController implements AbstractEntityController {
 
     private Random rand;
 
-    public NPCEntityController(){
-        rand = new Random();
+    public NPCEntityController() {
+        this.rand = new Random();
     }
 
     @Override
@@ -44,5 +44,9 @@ public class NPCEntityController implements AbstractEntityController {
 
     private boolean gotCriticalAttack() {
         return rand.nextDouble(1.0) < 0.3;
+    }
+
+    public void setRand(Random rand) {
+        this.rand = rand;
     }
 }
