@@ -85,7 +85,7 @@ public class Training implements Level {
         while (true) {
             List<Entity> winner = battle.play();
 
-            if (winner.equals(battle.getTeamTwo())) {
+            if (winner.equals(battle.getTeamOne())) {
                 break;
             } else {
                 battle.getTeamOne().forEach(Entity::revive);
