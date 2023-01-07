@@ -143,6 +143,9 @@ public class Client{
         List<InetAddress> ips = getAvailableIps();
         List<InetAddress> possibleServers = new ArrayList<>();
         for(InetAddress valid : ips){
+            if(valid.toString().equals("/192.168.0.1")){
+                continue;
+            }
             Socket s = null;
             try {
                 s = new Socket(valid.toString().substring(1), port);
