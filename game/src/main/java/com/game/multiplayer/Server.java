@@ -31,7 +31,7 @@ import static java.lang.Math.random;
 //listen server
 public class Server{
     private static ServerSocket serverSocket;
-    private static ServerState serverState = ServerState.IDLE;
+    public static ServerState serverState = ServerState.IDLE;
     private boolean bServerMove = false;
     final private static int playerNum = 1;
     private static int roundNumber = 0;
@@ -45,6 +45,14 @@ public class Server{
     private static boolean winnerPlayerOne = false;
 
     private static volatile Server INSTANCE;
+
+    public Entity getPlayerOne() {
+        return playerOne;
+    }
+
+    public Entity getPlayerTwo() {
+        return playerTwo;
+    }
 
     public static Server getInstance(){
         if(null == INSTANCE){
