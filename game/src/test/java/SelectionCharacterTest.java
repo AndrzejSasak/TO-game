@@ -61,7 +61,7 @@ public class SelectionCharacterTest {
 
         entity = selectionCharacterCommand.getEntity();
 
-        assertEquals(entity.getProfessionName(), properType);
+        assertEquals(properType, entity.getProfessionName());
     }
 
     @Test
@@ -75,7 +75,7 @@ public class SelectionCharacterTest {
 
         entity = selectionCharacterCommand.getEntity();
 
-        assertEquals(entity.getName(), "Arrow");
+        assertEquals("Arrow", entity.getName());
     }
 
     @Test
@@ -105,5 +105,22 @@ public class SelectionCharacterTest {
 
         String[] output = outContent.toString().split("\n");
         assertEquals(message, output[output.length - 1].trim());
+    }
+
+    @Test
+    void ShouldUpdateEntityCharacter() {
+        Entity newEntity = entitiesFactory.createEntity(properType, entityName, null);
+        Entity warriorEntity = entitiesFactory.createEntity("Warrior", entityName, null);
+
+        SelectionCharacterCommand selectionCharacterCommand = new SelectionCharacterCommand(entity, newEntity);
+        commandExecutor.executeCommand(selectionCharacterCommand);
+
+        entity = selectionCharacterCommand.getEntity();
+
+        ByteArrayInputStream in = new ByteArrayInputStream(("Warrior").getBytes());
+        System.setIn(in);
+        entity = new SelectEntityType().updateEntity(entity);
+
+        assertEquals(entity.getProfessionName(), warriorEntity.getProfessionName() );
     }
 }
