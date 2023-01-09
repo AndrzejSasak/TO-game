@@ -18,11 +18,18 @@ import java.util.*;
 
 public class LeaderboardParser implements ILeadeboardParser {
 
-    private final String LEADERBOARD_URL = "https://jsonblob.com/api/1054741520221224960";
+    private final String LEADERBOARD_URL;
     private final ObjectMapper objectMapper;
     private final HttpClient httpClient;
 
     public LeaderboardParser() {
+        LEADERBOARD_URL = "https://jsonblob.com/api/1054741520221224960";
+        this.objectMapper = new ObjectMapper();
+        httpClient = HttpClientBuilder.create().build();
+    }
+
+    public LeaderboardParser(String LEADERBOARD_URL) {
+        this.LEADERBOARD_URL = LEADERBOARD_URL;
         this.objectMapper = new ObjectMapper();
         httpClient = HttpClientBuilder.create().build();
     }
