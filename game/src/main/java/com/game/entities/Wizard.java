@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class Wizard extends Entity {
     public Wizard(String name, AbstractEntityController controller) {
         super(name, controller);
-        this.professionName = "Archer";
+        this.professionName = "Wizard";
         init(1);
     }
 
