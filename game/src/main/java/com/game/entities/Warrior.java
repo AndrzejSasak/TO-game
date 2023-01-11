@@ -10,7 +10,7 @@ public class Warrior extends Entity {
 
     public Warrior(String name, AbstractEntityController controller){
         super(name, controller);
-        this.professionName = "Archer";
+        this.professionName = "Warrior";
         init(1);
     }
 
