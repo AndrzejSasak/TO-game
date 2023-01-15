@@ -282,8 +282,8 @@ public class Server{
             User userOne = userOneOptional.get();
             User userTwo = userTwoOptional.get();
             Set<User> userSet = leaderboard.getUsers();
-            long userOneScore = 0;
-            long userTwoScore = 0;
+            long userOneScore = 1000;
+            long userTwoScore = 1000;
             for(User currentUser : userSet){
                 if(currentUser.getLogin().equals(userOne.getLogin())){
                     userOneScore = currentUser.getHighScore();
